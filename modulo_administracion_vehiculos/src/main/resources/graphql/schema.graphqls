@@ -1,0 +1,116 @@
+type Vehiculo {
+    id: ID!
+    placa: String!
+    marca: String!
+    modelo: String!
+    anio: Int!
+    tipo: TipoVehiculo!
+    estado: String!
+    mantenimientos: [Mantenimiento!]!
+    seguros: [Seguro!]!
+    combustibles: [Combustible!]!
+}
+
+type TipoVehiculo {
+    id: ID!
+    descripcion: String!
+    capacidad: Int!
+    transmision: String!
+}
+
+type Mantenimiento {
+    id: ID!
+    vehiculo: Vehiculo!
+    fecha_inicio: String!
+    fecha_fin: String!
+    descripcion: String!
+    costo: Float!
+}
+
+type Seguro {
+    id: ID!
+    vehiculo: Vehiculo!
+    compania: String!
+    tipo_cobertura: String!
+    fecha_inicio: String!
+    fecha_fin: String!
+}
+
+type Combustible {
+    id: ID!
+    vehiculo: Vehiculo!
+    tipo: String!
+    consumo_litros_100km: Float!
+}
+
+type Query {
+    vehiculos: [Vehiculo!]!
+    vehiculo(id: ID!): Vehiculo
+    tiposVehiculo: [TipoVehiculo!]!
+    tipoVehiculo(id: ID!): TipoVehiculo
+    mantenimientos: [Mantenimiento!]!
+    mantenimiento(id: ID!): Mantenimiento
+    seguros: [Seguro!]!
+    seguro(id: ID!): Seguro
+    combustibles: [Combustible!]!
+    combustible(id: ID!): Combustible
+}
+
+input VehiculoInput {
+    placa: String!
+    marca: String!
+    modelo: String!
+    anio: Int!
+    tipo_id: ID!
+    estado: String!
+}
+
+input TipoVehiculoInput {
+    descripcion: String!
+    capacidad: Int!
+    transmision: String!
+}
+
+input MantenimientoInput {
+    vehiculo_id: ID!
+    fecha_inicio: String!
+    fecha_fin: String!
+    descripcion: String!
+    costo: Float!
+}
+
+input SeguroInput {
+    vehiculo_id: ID!
+    compania: String!
+    tipo_cobertura: String!
+    fecha_inicio: String!
+    fecha_fin: String!
+}
+
+input CombustibleInput {
+    vehiculo_id: ID!
+    tipo: String!
+    consumo_litros_100km: Float!
+}
+
+type Mutation {
+    createVehiculo(input: VehiculoInput!): Vehiculo!
+    updateVehiculo(id: ID!, input: VehiculoInput!): Vehiculo!
+    deleteVehiculo(id: ID!): Boolean!
+    
+    createTipoVehiculo(input: TipoVehiculoInput!): TipoVehiculo!
+    updateTipoVehiculo(id: ID!, input: TipoVehiculoInput!): TipoVehiculo!
+    deleteTipoVehiculo(id: ID!): Boolean!
+    
+    createMantenimiento(input: MantenimientoInput!): Mantenimiento!
+    updateMantenimiento(id: ID!, input: MantenimientoInput!): Mantenimiento!
+    deleteMantenimiento(id: ID!): Boolean!
+    
+    createSeguro(input: SeguroInput!): Seguro!
+    updateSeguro(id: ID!, input: SeguroInput!): Seguro!
+    deleteSeguro(id: ID!): Boolean!
+    
+    createCombustible(input: CombustibleInput!): Combustible!
+    updateCombustible(id: ID!, input: CombustibleInput!): Combustible!
+    deleteCombustible(id: ID!): Boolean!
+}
