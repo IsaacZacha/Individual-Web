@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel Reverb Tester - Protocolo Pusher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .connecting { background-color: #fff3cd; color: #856404; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f8f9fa;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .config-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Laravel Reverb Tester - Protocolo Pusher</h1>
+        
+        <div class="warning">
+            <strong>⚠️ IMPORTANTE:</strong> Laravel Reverb usa <strong>protocolo Pusher</strong>, NO WebSocket directo.
+            <br>Esta herramienta usa <strong>Laravel Echo + Pusher JS</strong> para conectar correctamente.
+        </div>
+
+        <div id="status" class="status disconnected">
+            ❌ Desconectado
+        </div>
+
+        <div class="config-section">
+            <h3>📡 Configuración de Conexión</h3>
+            <label>App Key Pusher:</label>
+            <input type="text" id="appKey" value="gzbmxzp7oozsmb8cor5t" readonly>
+            
+            <label>Host:</label>
+            <input type="text" id="host" value="127.0.0.1" readonly>
+            
+            <label>Puerto:</label>
+            <input type="text" id="port" value="8080" readonly>
+            
+            <label>Protocolo:</label>
+            <input type="text" id="scheme" value="ws" readonly>
+        </div>
+
+        <div>
+            <button id="connectBtn" onclick="connectPusher()">🔗 Conectar con Pusher</button>
+            <button id="disconnectBtn" onclick="disconnectPusher()" disabled>❌ Desconectar</button>
+            <button onclick="clearMessages()">🗑️ Limpiar</button>
+            <button onclick="testEvents()">🧪 Probar Eventos</button>
+        </div>
+
+        <div>
+            <h3>📤 Enviar Evento de Prueba</h3>
+            <input type="text" id="channelInput" placeholder="Canal (ej: test-channel)" value="test-channel">
+            <input type="text" id="eventInput" placeholder="Evento (ej: test-event)" value="test-event">
+            <input type="text" id="messageInput" placeholder="Mensaje" value="Hello from Laravel Reverb!">
+            <button id="sendBtn" onclick="sendTestEvent()" disabled>📤 Enviar Evento</button>
+        </div>
+
+        <div>
+            <h3>📥 Eventos Recibidos</h3>
+            <div id="messages" class="messages"></div>
+        </div>
+
+        <div>
+            <h3>📋 Estado de la Conexión</h3>
+            <ul>
+                <li><strong>Servidor Laravel:</strong> http://127.0.0.1:8000</li>
+                <li><strong>Laravel Reverb:</strong> ws://127.0.0.1:8080</li>
+                <li><strong>Protocolo:</strong> <span id="protocol">Pusher WebSocket</span></li>
+                <li><strong>Estado:</strong> <span id="connectionState">Desconectado</span></li>
+                <li><strong>App Key:</strong> <span id="displayAppKey">gzbmxzp7oozsmb8cor5t</span></li>
+            </ul>
+        </div>
+
+        <div class="config-section">
+            <h3>💡 Información Técnica</h3>
+            <p><strong>¿Por qué no funciona WebSocket directo?</strong></p>
+            <ul>
+                <li>Laravel Reverb implementa el <strong>protocolo Pusher</strong></li>
+                <li>Requiere <strong>autenticación por App Key</strong></li>
+                <li>Usa <strong>canales y eventos</strong> específicos</li>
+                <li>No acepta <strong>conexiones WebSocket simples</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Pusher JS -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    
+    <script>
+        let pusher = null;
+        let channel = null;
+
+        function updateStatus(message, className) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${className}`;
+            document.getElementById('connectionState').textContent = message.replace(/[❌✅⏳]/g, '').trim();
+        }
+
+        function addMessage(message, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                'info': '#007bff',
+                'success': '#28a745',
+                'error': '#dc3545',
+                'warning': '#ffc107',
+                'event': '#6f42c1'
+            };
+            
+            messagesDiv.innerHTML += `
+                <div style="color: ${colors[type]}; margin: 5px 0; border-left: 3px solid ${colors[type]}; padding-left: 10px;">
+                    [${timestamp}] ${message}
+                </div>
+            `;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function connectPusher() {
+            const appKey = document.getElementById('appKey').value;
+            const host = document.getElementById('host').value;
+            const port = document.getElementById('port').value;
+
+            updateStatus('⏳ Conectando con Laravel Reverb...', 'connecting');
+            addMessage('🔄 Iniciando conexión Pusher con Laravel Reverb...', 'info');
+
+            try {
+                // Configuración para Laravel Reverb
+                pusher = new Pusher(appKey, {
+                    wsHost: host,
+                    wsPort: port,
+                    wssPort: port,
+                    forceTLS: false,
+                    encrypted: false,
+                    disableStats: true,
+                    enabledTransports: ['ws', 'wss'],
+                    cluster: '', // Laravel Reverb no usa cluster
+                    auth: {
+                        headers: {
+                            'X-CSRF-TOKEN': 'not-required-for-public-channels'
+                        }
+                    }
+                });
+
+                // Event listeners para la conexión
+                pusher.connection.bind('connected', function() {
+                    updateStatus('✅ Conectado a Laravel Reverb', 'connected');
+                    addMessage('✅ Conexión establecida exitosamente con Laravel Reverb!', 'success');
+                    addMessage(`📡 Socket ID: ${pusher.connection.socket_id}`, 'success');
+                    
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                    document.getElementById('sendBtn').disabled = false;
+
+                    // Suscribirse a canal de prueba
+                    subscribeToTestChannel();
+                });
+
+                pusher.connection.bind('disconnected', function() {
+                    updateStatus('❌ Desconectado', 'disconnected');
+                    addMessage('❌ Conexión cerrada', 'warning');
+                    
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                });
+
+                pusher.connection.bind('error', function(err) {
+                    updateStatus('❌ Error de conexión', 'disconnected');
+                    addMessage(`❌ Error: ${err.error || err.message || 'Error desconocido'}`, 'error');
+                    
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                });
+
+                pusher.connection.bind('unavailable', function() {
+                    updateStatus('❌ Servicio no disponible', 'disconnected');
+                    addMessage('❌ Laravel Reverb no está disponible. Verifica que esté ejecutándose.', 'error');
+                });
+
+                // Conectar
+                addMessage('🔌 Conectando...', 'info');
+
+            } catch (error) {
+                updateStatus('❌ Error de configuración', 'disconnected');
+                addMessage(`❌ Error al configurar Pusher: ${error.message}`, 'error');
+            }
+        }
+
+        function subscribeToTestChannel() {
+            try {
+                // Suscribirse a canal público de prueba
+                channel = pusher.subscribe('test-channel');
+                
+                channel.bind('pusher:subscription_succeeded', function() {
+                    addMessage('📡 Suscrito al canal "test-channel"', 'success');
+                });
+
+                channel.bind('pusher:subscription_error', function(err) {
+                    addMessage(`❌ Error de suscripción: ${err.error}`, 'error');
+                });
+
+                // Escuchar eventos personalizados
+                channel.bind('test-event', function(data) {
+                    addMessage(`📨 Evento recibido: ${JSON.stringify(data)}`, 'event');
+                });
+
+                addMessage('📡 Suscribiéndose a canal de prueba...', 'info');
+
+            } catch (error) {
+                addMessage(`❌ Error al suscribirse: ${error.message}`, 'error');
+            }
+        }
+
+        function disconnectPusher() {
+            if (pusher) {
+                pusher.disconnect();
+                pusher = null;
+                channel = null;
+                addMessage('🔌 Desconexión iniciada por el usuario', 'info');
+            }
+        }
+
+        function sendTestEvent() {
+            const channelName = document.getElementById('channelInput').value;
+            const eventName = document.getElementById('eventInput').value;
+            const message = document.getElementById('messageInput').value;
+
+            addMessage('⚠️ Nota: Los eventos deben enviarse desde el servidor Laravel, no desde el cliente.', 'warning');
+            addMessage(`💡 Para probar, ejecuta desde Laravel: Event::dispatch(new TestEvent('${message}'))`, 'info');
+            
+            // Limpiar campos
+            document.getElementById('messageInput').value = '';
+        }
+
+        function testEvents() {
+            addMessage('🧪 Para probar eventos, puedes usar estos comandos en Laravel:', 'info');
+            addMessage('📋 php artisan tinker', 'info');
+            addMessage('📋 use Illuminate\\Support\\Facades\\Event;', 'info');
+            addMessage('📋 Event::dispatch(new TestEvent("Hello World"));', 'info');
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+
+        // Mensaje de bienvenida
+        window.onload = function() {
+            addMessage('🚀 Laravel Reverb Tester cargado (Protocolo Pusher)', 'info');
+            addMessage('💡 Asegúrate de que Laravel Reverb esté ejecutándose: php artisan reverb:start', 'warning');
+            addMessage('🔧 Esta herramienta usa el protocolo Pusher correcto para Laravel Reverb', 'info');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+{
+  "info": {
+    "name": "Sistema Administración - Microservicios + RabbitMQ",
+    "description": "Colección completa para probar GraphQL, RabbitMQ y el sistema de microservicios",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔥 GRAPHQL - CRUD COMPLETO",
+      "item": [
+        {
+          "name": "📊 Estadísticas Generales",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { estadisticas { totalEmpleados totalVehiculos totalSucursales totalUsuarios vehiculosPorEstado { estado count } } }\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "👥 Listar Todos los Empleados",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { empleados { id_empleado nombre cargo correo telefono created_at } }\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "🚗 Listar Todos los Vehículos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { vehiculos { id_vehiculo placa marca modelo anio tipo_id estado created_at } }\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "🏢 Listar Todas las Sucursales",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { sucursales { id_sucursal nombre direccion ciudad telefono created_at } }\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "👤 Listar Todos los Usuarios",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { users { id name email email_verified_at created_at rol { nombre descripcion } } }\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "🔗 Listar Asignaciones Vehículo-Sucursal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { vehiculoSucursales { id id_vehiculo id_sucursal fecha_asignacion vehiculo { placa marca modelo } sucursal { nombre ciudad } } }\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "✅ MUTATIONS - CREAR DATOS",
+      "item": [
+        {
+          "name": "➕ Crear Empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CrearEmpleado($input: EmpleadoInput!) { crearEmpleado(input: $input) { id_empleado nombre cargo correo telefono created_at } }\",\n  \"variables\": {\n    \"input\": {\n      \"nombre\": \"Juan Carlos\",\n      \"apellido\": \"Pérez García\",\n      \"dni\": \"12345678\",\n      \"telefono\": \"987654321\",\n      \"id_rol\": \"1\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "➕ Crear Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CrearVehiculo($input: VehiculoInput!) { crearVehiculo(input: $input) { id_vehiculo placa marca modelo anio tipo_id estado created_at } }\",\n  \"variables\": {\n    \"input\": {\n      \"placa\": \"ABC-1234\",\n      \"marca\": \"Toyota\",\n      \"modelo\": \"Corolla\",\n      \"anio\": 2023,\n      \"tipo_id\": \"sedan\",\n      \"estado\": \"disponible\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "➕ Crear Sucursal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CrearSucursal($input: SucursalInput!) { crearSucursal(input: $input) { id_sucursal nombre direccion ciudad telefono created_at } }\",\n  \"variables\": {\n    \"input\": {\n      \"nombre\": \"Sucursal Central\",\n      \"direccion\": \"Av. Javier Prado 1234\",\n      \"ciudad\": \"Lima\",\n      \"telefono\": \"01-2345678\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "➕ Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CrearUsuario($input: UserInput!) { crearUsuario(input: $input) { id name email created_at } }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"Carlos Admin\",\n      \"email\": \"carlos.admin@empresa.com\",\n      \"password\": \"password123\",\n      \"rol_id\": \"1\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "➕ Crear Rol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CrearRol($input: RolInput!) { crearRol(input: $input) { id_rol nombre descripcion created_at } }\",\n  \"variables\": {\n    \"input\": {\n      \"nombre\": \"Supervisor\",\n      \"descripcion\": \"Supervisor de operaciones\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "🔗 Asignar Vehículo a Sucursal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation AsignarVehiculo($input: VehiculoSucursalInput!) { asignarVehiculoSucursal(input: $input) { id id_vehiculo id_sucursal fecha_asignacion created_at } }\",\n  \"variables\": {\n    \"input\": {\n      \"id_vehiculo\": \"1\",\n      \"id_sucursal\": \"1\",\n      \"fecha_asignacion\": \"2025-07-26T10:00:00Z\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔄 MUTATIONS - ACTUALIZAR DATOS",
+      "item": [
+        {
+          "name": "✏️ Actualizar Empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ActualizarEmpleado($id: ID!, $input: EmpleadoInput!) { actualizarEmpleado(id_empleado: $id, input: $input) { id_empleado nombre cargo correo telefono updated_at } }\",\n  \"variables\": {\n    \"id\": \"1\",\n    \"input\": {\n      \"nombre\": \"Juan Carlos ACTUALIZADO\",\n      \"apellido\": \"Pérez García\",\n      \"dni\": \"12345678\",\n      \"telefono\": \"999888777\",\n      \"id_rol\": \"1\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "🚗 Cambiar Estado de Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CambiarEstado($id: ID!, $estado: String!) { cambiarEstadoVehiculo(id_vehiculo: $id, estado: $estado) { id_vehiculo placa estado updated_at } }\",\n  \"variables\": {\n    \"id\": \"1\",\n    \"estado\": \"ocupado\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "✏️ Actualizar Sucursal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ActualizarSucursal($id: ID!, $input: SucursalInput!) { actualizarSucursal(id_sucursal: $id, input: $input) { id_sucursal nombre direccion ciudad telefono updated_at } }\",\n  \"variables\": {\n    \"id\": \"1\",\n    \"input\": {\n      \"nombre\": \"Sucursal Central RENOVADA\",\n      \"direccion\": \"Av. Javier Prado 1234 - Nuevo Local\",\n      \"ciudad\": \"Lima\",\n      \"telefono\": \"01-9876543\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/graphql",
+              "host": ["{{base_url}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🐰 RABBITMQ - MICROSERVICIOS",
+      "item": [
+        {
+          "name": "🔍 Estado de RabbitMQ (Health Check)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/rabbitmq/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rabbitmq", "health"]
+            }
+          }
+        },
+        {
+          "name": "📤 Enviar Evento de Empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entity_type\": \"empleado\",\n  \"action\": \"created\",\n  \"data\": {\n    \"id_empleado\": \"EMP-001\",\n    \"nombre\": \"María López\",\n    \"cargo\": \"Conductora\",\n    \"correo\": \"maria.lopez@empresa.com\",\n    \"telefono\": \"987654321\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/rabbitmq/publish",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rabbitmq", "publish"]
+            }
+          }
+        },
+        {
+          "name": "📤 Enviar Evento de Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entity_type\": \"vehiculo\",\n  \"action\": \"status_changed\",\n  \"data\": {\n    \"id_vehiculo\": \"VEH-001\",\n    \"placa\": \"XYZ-9876\",\n    \"marca\": \"Honda\",\n    \"modelo\": \"Civic\",\n    \"estado_anterior\": \"disponible\",\n    \"estado_nuevo\": \"mantenimiento\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/rabbitmq/publish",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rabbitmq", "publish"]
+            }
+          }
+        },
+        {
+          "name": "📤 Enviar Evento de Asignación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entity_type\": \"vehiculo_sucursal\",\n  \"action\": \"assigned\",\n  \"data\": {\n    \"id_vehiculo\": \"VEH-001\",\n    \"id_sucursal\": \"SUC-001\",\n    \"fecha_asignacion\": \"2025-07-26T15:30:00Z\",\n    \"empleado_responsable\": \"EMP-001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/rabbitmq/publish",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rabbitmq", "publish"]
+            }
+          }
+        },
+        {
+          "name": "📊 Estadísticas de Colas RabbitMQ",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/rabbitmq/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rabbitmq", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎯 PRUEBAS COMPLETAS",
+      "item": [
+        {
+          "name": "🔄 Flujo Completo: Crear Empleado + Evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleado\": {\n    \"nombre\": \"Pedro\",\n    \"apellido\": \"Ramírez\",\n    \"dni\": \"87654321\",\n    \"telefono\": \"912345678\",\n    \"id_rol\": \"1\"\n  },\n  \"publish_event\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/test/create-empleado-with-event",
+              "host": ["{{base_url}}"],
+              "path": ["api", "test", "create-empleado-with-event"]
+            }
+          }
+        },
+        {
+          "name": "🚗 Flujo Completo: Crear Vehículo + Asignar + Evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo\": {\n    \"placa\": \"DEF-5678\",\n    \"marca\": \"Nissan\",\n    \"modelo\": \"Sentra\",\n    \"anio\": 2024,\n    \"tipo_id\": \"sedan\",\n    \"estado\": \"disponible\"\n  },\n  \"sucursal_id\": \"1\",\n  \"publish_events\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/test/create-vehiculo-assign-with-events",
+              "host": ["{{base_url}}"],
+              "path": ["api", "test", "create-vehiculo-assign-with-events"]
+            }
+          }
+        },
+        {
+          "name": "📊 Dashboard Data (Todas las entidades)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/data",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "data"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ]
+}

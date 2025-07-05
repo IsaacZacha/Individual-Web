@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema GraphQL + WebSocket - Test Completo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .events { height: 300px; overflow-y: auto; background: #f5f5f5; padding: 10px; }
+        .event { margin: 5px 0; padding: 8px; background: white; border-radius: 3px; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        input, select { padding: 8px; margin: 5px; width: 200px; }
+        .status { font-weight: bold; padding: 10px; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Laravel Reverb WebSocket Testing</h1>
+        
+        <!-- Estado de conexión -->
+        <div class="section">
+            <h2>📡 Estado de Conexión</h2>
+            <div id="connection-status" class="status disconnected">Desconectado</div>
+            <button onclick="connect()">Conectar</button>
+            <button onclick="disconnect()">Desconectar</button>
+            <button onclick="testConnection()">🔧 Diagnosticar Conexión</button>
+            <button onclick="checkServerStatus()">📡 Verificar Servidor</button>
+        </div>
+
+        <!-- Suscripción a canales -->
+        <div class="section">
+            <h2>📢 Canales</h2>
+            <select id="channel-select">
+                <option value="usuarios">👤 usuarios</option>
+                <option value="empleados">👥 empleados</option>
+                <option value="roles">🔐 roles</option>
+                <option value="vehiculos">🚗 vehiculos</option>
+                <option value="sucursales">🏢 sucursales</option>
+                <option value="vehiculo-sucursal">🔗 vehiculo-sucursal</option>
+                <option value="dashboard">📊 dashboard</option>
+            </select>
+            <button onclick="subscribeToChannel()">Suscribirse</button>
+            <button onclick="unsubscribeFromChannel()">Desuscribirse</button>
+            <button onclick="subscribeToAllChannels()">📡 Suscribirse a Todos</button>
+            <button onclick="unsubscribeFromAllChannels()">🔕 Desuscribirse de Todos</button>
+            
+            <h3>Canales activos:</h3>
+            <div id="active-channels"></div>
+        </div>
+
+        <!-- Test de GraphQL + WebSocket -->
+        <div class="section">
+            <h2>🚀 Test GraphQL + WebSocket</h2>
+            
+            <!-- Flujo Recomendado -->
+            <div style="background: #e7f3ff; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                <h3>� Flujo Recomendado para Testing</h3>
+                <p><strong>1.</strong> Crear Sucursal → <strong>2.</strong> Crear Rol → <strong>3.</strong> Crear Empleado → <strong>4.</strong> Crear Usuario → <strong>5.</strong> Crear Vehículo → <strong>6.</strong> Asignar Vehículo-Sucursal</p>
+                <button onclick="crearFlujocompleto()" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">🚀 Ejecutar Flujo Completo</button>
+            </div>
+
+            <!-- Sucursales PRIMERO -->
+            <h3>🏢 Sucursales (Crear Primero)</h3>
+            <input type="text" id="sucursal_nombre" placeholder="Nombre" value="Sucursal Centro">
+            <input type="text" id="sucursal_direccion" placeholder="Dirección" value="Av. Principal 123">
+            <input type="text" id="sucursal_ciudad" placeholder="Ciudad" value="Ciudad Principal">
+            <input type="text" id="sucursal_telefono" placeholder="Teléfono" value="987654321">
+            <button onclick="generateSucursalData()">🎲 Generar Datos</button>
+            <button onclick="createSucursal()">Crear Sucursal</button>
+            <input type="number" id="sucursal_update_id" placeholder="Sucursal ID" value="17">
+            <button onclick="updateSucursal()">Actualizar Sucursal</button>
+            <input type="number" id="sucursal_delete_id" placeholder="Sucursal ID" value="17">
+            <button onclick="deleteSucursal()">Eliminar Sucursal</button>
+
+            <!-- Roles SEGUNDO -->
+            <h3>� Roles (Crear Segundo)</h3>
+            <input type="text" id="rol_nombre" placeholder="Nombre Rol" value="Administrador">
+            <input type="text" id="rol_descripcion" placeholder="Descripción" value="Rol con permisos completos">
+            <button onclick="generateRolData()">🎲 Generar Datos</button>
+            <button onclick="createRol()">Crear Rol</button>
+            <input type="number" id="rol_update_id" placeholder="Rol ID" value="1">
+            <button onclick="updateRol()">Actualizar Rol</button>
+            <input type="number" id="rol_delete_id" placeholder="Rol ID" value="1">
+            <button onclick="deleteRol()">Eliminar Rol</button>
+
+            <!-- Empleados TERCERO -->
+            <h3>👥 Empleados (Crear Tercero)</h3>
+            <input type="text" id="empleado_nombre" placeholder="Nombre" value="Sofía María">
+            <input type="text" id="empleado_cargo" placeholder="Cargo" value="Administrador">
+            <input type="text" id="empleado_correo" placeholder="Correo" value="sofía.administrador381@empresa.com">
+            <input type="text" id="empleado_telefono" placeholder="Teléfono" value="900000381">
+            <button onclick="generateEmpleadoData()">🎲 Generar Datos</button>
+            <button onclick="createEmpleado()">Crear Empleado</button>
+            <input type="number" id="empleado_update_id" placeholder="Empleado ID" value="22">
+            <button onclick="updateEmpleado()">Actualizar Empleado</button>
+            <input type="number" id="empleado_delete_id" placeholder="Empleado ID" value="22">
+            <button onclick="deleteEmpleado()">Eliminar Empleado</button>
+
+            <!-- Usuarios CUARTO -->
+            <h3>� Usuarios (Crear Cuarto)</h3>
+            <input type="text" id="username" placeholder="Username" value="user_1753653827808_390">
+            <input type="text" id="password" placeholder="Password" value="password123">
+            <input type="number" id="empleado_id" placeholder="Empleado ID" value="22">
+            <input type="number" id="rol_id" placeholder="Rol ID" value="24">
+            <button onclick="generateUniqueUsername()">🎲 Generar Username</button>
+            <button onclick="createUser()">Crear Usuario</button>
+            <input type="number" id="user_id" placeholder="User ID" value="11">
+            <input type="text" id="new_username" placeholder="Nuevo Username" value="usuario_actualizado">
+            <button onclick="updateUser()">Actualizar Usuario</button>
+            <input type="number" id="delete_user_id" placeholder="User ID para eliminar" value="11">
+            <button onclick="deleteUser()">Eliminar Usuario</button>
+
+            <!-- Vehículos QUINTO -->
+            <h3>🚗 Vehículos (Crear Quinto)</h3>
+            <input type="text" id="vehiculo_marca" placeholder="Marca" value="Ford">
+            <input type="text" id="vehiculo_modelo" placeholder="Modelo" value="Cruze">
+            <input type="number" id="vehiculo_año" placeholder="Año" value="2020">
+            <input type="text" id="vehiculo_patente" placeholder="Placa (no Patente)" value="DXX789">
+            <small style="color: #666;">💡 Nota: Campos disponibles: marca, modelo, anio, placa, tipo_id, estado</small>
+            <button onclick="generateVehiculoData()">🎲 Generar Datos</button>
+            <button onclick="createVehiculo()">Crear Vehículo</button>
+            <input type="number" id="vehiculo_update_id" placeholder="Vehículo ID" value="19">
+            <button onclick="updateVehiculo()">Actualizar Vehículo</button>
+            <input type="number" id="vehiculo_delete_id" placeholder="Vehículo ID" value="19">
+            <button onclick="deleteVehiculo()">Eliminar Vehículo</button>
+
+            <!-- Vehículo-Sucursal SEXTO -->
+            <h3>🔗 Asignación Vehículo-Sucursal (Crear Sexto)</h3>
+            <input type="number" id="vs_vehiculo_id" placeholder="Vehículo ID" value="19">
+            <input type="number" id="vs_sucursal_id" placeholder="Sucursal ID" value="42">
+            <input type="date" id="vs_fecha_asignacion" placeholder="Fecha Asignación" value="">
+            <button onclick="generateVSData()">🎲 Generar Datos</button>
+            <button onclick="createVehiculoSucursal()">Asignar Vehículo</button>
+            <input type="number" id="vs_update_id" placeholder="Asignación ID" value="26">
+            <button onclick="updateVehiculoSucursal()">Actualizar Asignación</button>
+            <input type="number" id="vs_delete_id" placeholder="Asignación ID" value="26">
+            <button onclick="deleteVehiculoSucursal()">Eliminar Asignación</button>
+        </div>
+
+        <!-- Log de eventos -->
+        <div class="section">
+            <h2>📋 Log de Eventos WebSocket</h2>
+            <div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                <strong>💡 Solución al Error de Clave Foránea:</strong><br>
+                Si ves errores de "Foreign key violation", ejecuta estos comandos en terminal:<br>
+                <code style="background: #f8f9fa; padding: 2px 5px; border-radius: 3px;">php setup_initial_data.php</code> (para crear datos básicos)<br>
+                <code style="background: #f8f9fa; padding: 2px 5px; border-radius: 3px;">php check_data.php</code> (para verificar datos)<br>
+                <code style="background: #f8f9fa; padding: 2px 5px; border-radius: 3px;">php artisan serve</code> (en un terminal)<br>
+                <code style="background: #f8f9fa; padding: 2px 5px; border-radius: 3px;">php artisan reverb:start</code> (en otro terminal)<br>
+                <strong>O usa el botón "🚀 Ejecutar Flujo Completo"</strong> que crea las entidades en el orden correcto.
+            </div>
+            <div style="margin: 10px 0;">
+                <button onclick="clearEvents()">Limpiar Log</button>
+                <button onclick="exportLog()">📥 Exportar Log</button>
+                <button onclick="toggleEventDetails()">🔍 Toggle Detalles</button>
+                <span id="event-counter" style="margin-left: 10px; font-weight: bold; color: #007bff;">Eventos: 0</span>
+            </div>
+            <div id="events-log" class="events"></div>
+        </div>
+    </div>
+
+    <!-- Laravel Echo + Pusher JS -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+        let pusher = null;
+        let channels = {};
+        let isConnected = false;
+
+        // Configuración de Pusher para Laravel Reverb
+        function connect() {
+            try {
+                // Configuración para Laravel Reverb con debugging mejorado
+                pusher = new Pusher('gzbmxzp7oozsmb8cor5t', {
+                    wsHost: '127.0.0.1',
+                    wsPort: 8080,
+                    wssPort: 8080,
+                    forceTLS: false,
+                    enabledTransports: ['ws'],
+                    disableStats: true,
+                    cluster: '', // No cluster para Reverb local
+                    enableLogging: true, // Habilitar logging para debug
+                    debug: true
+                });
+
+                pusher.connection.bind('connected', function() {
+                    isConnected = true;
+                    updateConnectionStatus('✅ Conectado a Laravel Reverb', 'connected');
+                    logEvent('✅ Conectado a Laravel Reverb exitosamente', 'success');
+                    logEvent(`📡 Estado de conexión: ${pusher.connection.state}`, 'info');
+                    logEvent(`🔗 Socket ID: ${pusher.connection.socket_id}`, 'info');
+                });
+
+                pusher.connection.bind('connecting', function() {
+                    logEvent('🔄 Conectando a Laravel Reverb...', 'info');
+                    logEvent('🔗 URL: ws://127.0.0.1:8080/app/gzbmxzp7oozsmb8cor5t', 'info');
+                    updateConnectionStatus('🔄 Conectando...', 'disconnected');
+                });
+
+                pusher.connection.bind('disconnected', function() {
+                    isConnected = false;
+                    updateConnectionStatus('❌ Desconectado', 'disconnected');
+                    logEvent('❌ Desconectado de Laravel Reverb', 'error');
+                });
+
+                pusher.connection.bind('unavailable', function() {
+                    isConnected = false;
+                    updateConnectionStatus('❌ Servidor no disponible', 'disconnected');
+                    logEvent('🚨 Servidor Laravel Reverb no disponible. ¿Está corriendo "php artisan reverb:start"?', 'error');
+                    logEvent('💡 Solución 1: Ejecuta "php artisan reverb:restart" en terminal', 'info');
+                    logEvent('💡 Solución 2: Verifica que QUEUE_CONNECTION=database en .env', 'info');
+                });
+
+                pusher.connection.bind('failed', function() {
+                    isConnected = false;
+                    updateConnectionStatus('❌ Conexión fallida', 'disconnected');
+                    logEvent('🚨 Conexión fallida. Verifica que Laravel Reverb esté corriendo en puerto 8080', 'error');
+                    logEvent('💡 Comando: php artisan reverb:start --host=127.0.0.1 --port=8080', 'info');
+                });
+
+                pusher.connection.bind('error', function(err) {
+                    logEvent('🚨 Error de conexión: ' + JSON.stringify(err), 'error');
+                    logEvent('💡 Solución: Ejecuta "php artisan reverb:start" en terminal', 'info');
+                    logEvent('🔧 Verifica también que el Queue Worker esté corriendo: "php artisan queue:work"', 'info');
+                });
+
+                // Bind para todos los estados posibles
+                pusher.connection.bind('state_change', function(states) {
+                    logEvent(`🔄 Estado cambió de ${states.previous} a ${states.current}`, 'info');
+                });
+
+            } catch (error) {
+                logEvent('🚨 Error al inicializar Pusher: ' + error.message, 'error');
+                logEvent('🔧 Verifica que Laravel Reverb esté corriendo: php artisan reverb:start', 'info');
+            }
+        }
+
+        function disconnect() {
+            if (pusher) {
+                // Desuscribirse de todos los canales
+                Object.keys(channels).forEach(channelName => {
+                    pusher.unsubscribe(channelName);
+                });
+                channels = {};
+                
+                pusher.disconnect();
+                pusher = null;
+                isConnected = false;
+                updateConnectionStatus('Desconectado', 'disconnected');
+                updateActiveChannels();
+                logEvent('🔌 Desconectado manualmente', 'info');
+            }
+        }
+
+        function subscribeToChannel() {
+            if (!pusher || !isConnected) {
+                logEvent('❌ No hay conexión activa', 'error');
+                return;
+            }
+
+            const channelName = document.getElementById('channel-select').value;
+            
+            if (channels[channelName]) {
+                logEvent(`⚠️ Ya estás suscrito al canal: ${channelName}`, 'info');
+                return;
+            }
+
+            try {
+                const channel = pusher.subscribe(channelName);
+                channels[channelName] = channel;
+
+                // Suscribirse a todos los eventos posibles del canal
+                const events = [
+                    // Eventos de Usuario
+                    'UserCreado', 'UserActualizado', 'UserEliminado',
+                    'usuario.creado', 'usuario.actualizado', 'usuario.eliminado',
+                    
+                    // Eventos de Empleado
+                    'EmpleadoCreado', 'EmpleadoActualizado', 'EmpleadoEliminado',
+                    'empleado.creado', 'empleado.actualizado', 'empleado.eliminado',
+                    
+                    // Eventos de Rol
+                    'RolCreado', 'RolActualizado', 'RolEliminado',
+                    'rol.creado', 'rol.actualizado', 'rol.eliminado',
+                    
+                    // Eventos de Vehículo
+                    'VehiculoCreado', 'VehiculoActualizado', 'VehiculoEliminado',
+                    'vehiculo.creado', 'vehiculo.actualizado', 'vehiculo.eliminado',
+                    
+                    // Eventos de Sucursal
+                    'SucursalCreada', 'SucursalActualizada', 'SucursalEliminada',
+                    'sucursal.creada', 'sucursal.actualizada', 'sucursal.eliminada',
+                    
+                    // Eventos de VehiculoSucursal
+                    'VehiculoSucursalCreado', 'VehiculoSucursalActualizado', 'VehiculoSucursalEliminado',
+                    'vehiculo-sucursal.creado', 'vehiculo-sucursal.actualizado', 'vehiculo-sucursal.eliminado'
+                ];
+
+                events.forEach(eventName => {
+                    channel.bind(eventName, function(data) {
+                        const timestamp = new Date().toLocaleTimeString();
+                        logEvent(`🎉 [${timestamp}] EVENTO RECIBIDO`, 'success');
+                        logEvent(`📡 Canal: "${channelName}" | Evento: "${eventName}"`, 'info');
+                        logEvent(`📦 Datos: ${JSON.stringify(data, null, 2)}`, 'info');
+                        logEvent(`🔗 Socket ID: ${pusher.connection.socket_id}`, 'info');
+                        logEvent(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'info');
+                    });
+                });
+
+                // Eventos de suscripción
+                channel.bind('pusher:subscription_succeeded', function() {
+                    logEvent(`✅ Suscrito exitosamente al canal: ${channelName}`, 'success');
+                    updateActiveChannels();
+                });
+
+                channel.bind('pusher:subscription_error', function(err) {
+                    logEvent(`❌ Error al suscribirse al canal ${channelName}: ${JSON.stringify(err)}`, 'error');
+                });
+
+            } catch (error) {
+                logEvent(`🚨 Error al suscribirse al canal ${channelName}: ${error.message}`, 'error');
+            }
+        }
+
+        function unsubscribeFromChannel() {
+            const channelName = document.getElementById('channel-select').value;
+            
+            if (!channels[channelName]) {
+                logEvent(`⚠️ No estás suscrito al canal: ${channelName}`, 'info');
+                return;
+            }
+
+            pusher.unsubscribe(channelName);
+            delete channels[channelName];
+            updateActiveChannels();
+            logEvent(`🔕 Desuscrito del canal: ${channelName}`, 'info');
+        }
+
+        function subscribeToAllChannels() {
+            if (!pusher || !isConnected) {
+                logEvent('❌ No hay conexión activa', 'error');
+                return;
+            }
+
+            const allChannels = ['usuarios', 'empleados', 'roles', 'vehiculos', 'sucursales', 'vehiculo-sucursal', 'dashboard'];
+            let subscribedCount = 0;
+
+            logEvent('🚀 Suscribiéndose a todos los canales...', 'info');
+
+            allChannels.forEach(channelName => {
+                if (!channels[channelName]) {
+                    try {
+                        const channel = pusher.subscribe(channelName);
+                        channels[channelName] = channel;
+
+                        // Suscribirse a todos los eventos
+                        const events = [
+                            'UserCreado', 'UserActualizado', 'UserEliminado',
+                            'EmpleadoCreado', 'EmpleadoActualizado', 'EmpleadoEliminado',
+                            'RolCreado', 'RolActualizado', 'RolEliminado',
+                            'VehiculoCreado', 'VehiculoActualizado', 'VehiculoEliminado',
+                            'SucursalCreada', 'SucursalActualizada', 'SucursalEliminada',
+                            'VehiculoSucursalCreado', 'VehiculoSucursalActualizado', 'VehiculoSucursalEliminado',
+                            'usuario.creado', 'usuario.actualizado', 'usuario.eliminado',
+                            'empleado.creado', 'empleado.actualizado', 'empleado.eliminado',
+                            'rol.creado', 'rol.actualizado', 'rol.eliminado',
+                            'vehiculo.creado', 'vehiculo.actualizado', 'vehiculo.eliminado',
+                            'sucursal.creada', 'sucursal.actualizada', 'sucursal.eliminada',
+                            'vehiculo-sucursal.creado', 'vehiculo-sucursal.actualizado', 'vehiculo-sucursal.eliminado'
+                        ];
+
+                        events.forEach(eventName => {
+                            channel.bind(eventName, function(data) {
+                                const timestamp = new Date().toLocaleTimeString();
+                                logEvent(`🎉 [${timestamp}] EVENTO RECIBIDO`, 'success');
+                                logEvent(`📡 Canal: "${channelName}" | Evento: "${eventName}"`, 'info');
+                                logEvent(`📦 Datos: ${JSON.stringify(data, null, 2)}`, 'info');
+                                logEvent(`🔗 Socket ID: ${pusher.connection.socket_id}`, 'info');
+                                logEvent(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'info');
+                            });
+                        });
+
+                        channel.bind('pusher:subscription_succeeded', function() {
+                            subscribedCount++;
+                            logEvent(`✅ Suscrito a canal: ${channelName} (${subscribedCount}/${allChannels.length})`, 'success');
+                            if (subscribedCount === allChannels.length) {
+                                updateActiveChannels();
+                                logEvent(`🎯 Suscripción completa a ${allChannels.length} canales`, 'success');
+                            }
+                        });
+
+                        channel.bind('pusher:subscription_error', function(err) {
+                            logEvent(`❌ Error al suscribirse al canal ${channelName}: ${JSON.stringify(err)}`, 'error');
+                        });
+
+                    } catch (error) {
+                        logEvent(`🚨 Error al suscribirse al canal ${channelName}: ${error.message}`, 'error');
+                    }
+                } else {
+                    logEvent(`⚠️ Ya estás suscrito al canal: ${channelName}`, 'info');
+                }
+            });
+        }
+
+        function unsubscribeFromAllChannels() {
+            if (!pusher) {
+                logEvent('❌ No hay conexión activa', 'error');
+                return;
+            }
+
+            const channelNames = Object.keys(channels);
+            
+            if (channelNames.length === 0) {
+                logEvent('⚠️ No hay canales activos para desuscribirse', 'info');
+                return;
+            }
+
+            logEvent(`🔕 Desuscribiéndose de ${channelNames.length} canales...`, 'info');
+
+            channelNames.forEach(channelName => {
+                pusher.unsubscribe(channelName);
+                delete channels[channelName];
+                logEvent(`🔕 Desuscrito del canal: ${channelName}`, 'info');
+            });
+
+            updateActiveChannels();
+            logEvent(`✅ Desuscripción completa de todos los canales`, 'success');
+        }
+
+        // Funciones para testing GraphQL + WebSocket
+        let lastCreatedUserId = null;
+        let lastCreatedEmpleadoId = null;
+        let lastCreatedRolId = null;
+        let lastCreatedVehiculoId = null;
+        let lastCreatedSucursalId = null;
+        let lastCreatedVSId = null;
+
+        // === USUARIOS ===
+        async function createUser() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const empleado_id = parseInt(document.getElementById('empleado_id').value);
+            const rol_id = parseInt(document.getElementById('rol_id').value);
+
+            const mutation = `
+                mutation CrearUser($input: UserInput!) {
+                    crearUser(input: $input) {
+                        id_usuario
+                        empleado_id
+                        username
+                        rol_id
+                        created_at
+                    }
+                }
+            `;
+
+            const variables = {
+                input: { 
+                    username, 
+                    password, 
+                    empleado_id: empleado_id || lastCreatedEmpleadoId || 1, 
+                    rol_id: rol_id || lastCreatedRolId || 1 
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: crearUser`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    const userData = result.data.crearUser;
+                    lastCreatedUserId = userData.id_usuario;
+                    
+                    document.getElementById('user_id').value = lastCreatedUserId;
+                    document.getElementById('delete_user_id').value = lastCreatedUserId;
+                    
+                    logEvent(`✅ Usuario creado: ${JSON.stringify(userData)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket UserCreado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al crear usuario: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateUser() {
+            const id = document.getElementById('user_id').value;
+            const username = document.getElementById('new_username').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un usuario para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation ActualizarUser($id: ID!, $input: UserInput!) {
+                    actualizarUser(id_usuario: $id, input: $input) {
+                        id_usuario
+                        username
+                        updated_at
+                    }
+                }
+            `;
+
+            const variables = {
+                id: id,
+                input: {
+                    empleado_id: parseInt(document.getElementById('empleado_id').value) || lastCreatedEmpleadoId || 1,
+                    username: username,
+                    password: "password123",
+                    rol_id: parseInt(document.getElementById('rol_id').value) || lastCreatedRolId || 1
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: actualizarUser (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Usuario actualizado: ${JSON.stringify(result.data.actualizarUser)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket UserActualizado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al actualizar usuario: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteUser() {
+            const id = document.getElementById('delete_user_id').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un usuario para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation EliminarUser($id: ID!) {
+                    eliminarUser(id_usuario: $id) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const variables = { id: id };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: eliminarUser (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Usuario eliminado: ${JSON.stringify(result.data.eliminarUser)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket UserEliminado...`, 'info');
+                    
+                    document.getElementById('user_id').value = '';
+                    document.getElementById('delete_user_id').value = '';
+                    lastCreatedUserId = null;
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al eliminar usuario: ${error.message}`, 'error');
+            }
+        }
+
+        // === EMPLEADOS ===
+        async function createEmpleado() {
+            const nombre = document.getElementById('empleado_nombre').value;
+            const cargo = document.getElementById('empleado_cargo').value;
+            const correo = document.getElementById('empleado_correo').value;
+            const telefono = document.getElementById('empleado_telefono').value;
+
+            const mutation = `
+                mutation CrearEmpleado($input: EmpleadoInput!) {
+                    crearEmpleado(input: $input) {
+                        id_empleado
+                        nombre
+                        cargo
+                        correo
+                        telefono
+                        created_at
+                    }
+                }
+            `;
+
+            const variables = {
+                input: { 
+                    nombre, 
+                    cargo, 
+                    correo, 
+                    telefono
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: crearEmpleado`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    const empleadoData = result.data.crearEmpleado;
+                    lastCreatedEmpleadoId = empleadoData.id_empleado;
+                    
+                    document.getElementById('empleado_update_id').value = lastCreatedEmpleadoId;
+                    document.getElementById('empleado_delete_id').value = lastCreatedEmpleadoId;
+                    document.getElementById('empleado_id').value = lastCreatedEmpleadoId; // Para usuarios
+                    
+                    logEvent(`✅ Empleado creado: ${JSON.stringify(empleadoData)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket EmpleadoCreado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al crear empleado: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateEmpleado() {
+            const id = document.getElementById('empleado_update_id').value;
+            const nombre = document.getElementById('empleado_nombre').value;
+            const cargo = document.getElementById('empleado_cargo').value;
+            const correo = document.getElementById('empleado_correo').value;
+            const telefono = document.getElementById('empleado_telefono').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un empleado para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation ActualizarEmpleado($id: ID!, $input: EmpleadoInput!) {
+                    actualizarEmpleado(id_empleado: $id, input: $input) {
+                        id_empleado
+                        nombre
+                        cargo
+                        correo
+                        telefono
+                        updated_at
+                    }
+                }
+            `;
+
+            const variables = {
+                id: id,
+                input: {
+                    nombre: nombre + "_actualizado",
+                    cargo: cargo + "_modificado",
+                    correo: correo.replace('@', '_actualizado@'),
+                    telefono: telefono || "999888777"
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: actualizarEmpleado (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Empleado actualizado: ${JSON.stringify(result.data.actualizarEmpleado)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket EmpleadoActualizado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al actualizar empleado: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteEmpleado() {
+            const id = document.getElementById('empleado_delete_id').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un empleado para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation EliminarEmpleado($id: ID!) {
+                    eliminarEmpleado(id_empleado: $id) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const variables = { id: id };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: eliminarEmpleado (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Empleado eliminado: ${JSON.stringify(result.data.eliminarEmpleado)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket EmpleadoEliminado...`, 'info');
+                    
+                    document.getElementById('empleado_update_id').value = '';
+                    document.getElementById('empleado_delete_id').value = '';
+                    lastCreatedEmpleadoId = null;
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al eliminar empleado: ${error.message}`, 'error');
+            }
+        }
+
+        // === ROLES ===
+        async function createRol() {
+            const nombre = document.getElementById('rol_nombre').value;
+            const descripcion = document.getElementById('rol_descripcion').value;
+
+            const mutation = `
+                mutation CrearRol($input: RolInput!) {
+                    crearRol(input: $input) {
+                        id_rol
+                        nombre
+                        descripcion
+                        created_at
+                    }
+                }
+            `;
+
+            const variables = {
+                input: { nombre, descripcion }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: crearRol`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    const rolData = result.data.crearRol;
+                    lastCreatedRolId = rolData.id_rol;
+                    
+                    document.getElementById('rol_update_id').value = lastCreatedRolId;
+                    document.getElementById('rol_delete_id').value = lastCreatedRolId;
+                    document.getElementById('rol_id').value = lastCreatedRolId; // Para usuarios
+                    
+                    logEvent(`✅ Rol creado: ${JSON.stringify(rolData)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket RolCreado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al crear rol: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateRol() {
+            const id = document.getElementById('rol_update_id').value;
+            const nombre = document.getElementById('rol_nombre').value;
+            const descripcion = document.getElementById('rol_descripcion').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un rol para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation ActualizarRol($id: ID!, $input: RolInput!) {
+                    actualizarRol(id_rol: $id, input: $input) {
+                        id_rol
+                        nombre
+                        descripcion
+                        updated_at
+                    }
+                }
+            `;
+
+            const variables = {
+                id: id,
+                input: {
+                    nombre: nombre + "_actualizado",
+                    descripcion: descripcion + " (modificado)"
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: actualizarRol (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Rol actualizado: ${JSON.stringify(result.data.actualizarRol)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket RolActualizado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al actualizar rol: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteRol() {
+            const id = document.getElementById('rol_delete_id').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un rol para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation EliminarRol($id: ID!) {
+                    eliminarRol(id_rol: $id) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const variables = { id: id };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: eliminarRol (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Rol eliminado: ${JSON.stringify(result.data.eliminarRol)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket RolEliminado...`, 'info');
+                    
+                    document.getElementById('rol_update_id').value = '';
+                    document.getElementById('rol_delete_id').value = '';
+                    lastCreatedRolId = null;
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al eliminar rol: ${error.message}`, 'error');
+            }
+        }
+
+        // === VEHÍCULOS ===
+        async function createVehiculo() {
+            const marca = document.getElementById('vehiculo_marca').value;
+            const modelo = document.getElementById('vehiculo_modelo').value;
+            const año = parseInt(document.getElementById('vehiculo_año').value);
+            const placa = document.getElementById('vehiculo_patente').value; // Usando 'placa' no 'patente'
+            // Eliminando 'color' - no existe en el modelo
+
+            const mutation = `
+                mutation CrearVehiculo($input: VehiculoInput!) {
+                    crearVehiculo(input: $input) {
+                        id_vehiculo
+                        marca
+                        modelo
+                        anio
+                        placa
+                        tipo_id
+                        estado
+                        created_at
+                    }
+                }
+            `;
+
+            const variables = {
+                input: { 
+                    marca, 
+                    modelo, 
+                    anio: año, 
+                    placa, 
+                    tipo_id: "Sedan", // Valor por defecto
+                    estado: "Disponible" // Valor por defecto
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: crearVehiculo`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    const vehiculoData = result.data.crearVehiculo;
+                    lastCreatedVehiculoId = vehiculoData.id_vehiculo;
+                    
+                    document.getElementById('vehiculo_update_id').value = lastCreatedVehiculoId;
+                    document.getElementById('vehiculo_delete_id').value = lastCreatedVehiculoId;
+                    document.getElementById('vs_vehiculo_id').value = lastCreatedVehiculoId; // Para asignaciones
+                    
+                    logEvent(`✅ Vehículo creado: ${JSON.stringify(vehiculoData)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket VehiculoCreado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al crear vehículo: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateVehiculo() {
+            const id = document.getElementById('vehiculo_update_id').value;
+            const marca = document.getElementById('vehiculo_marca').value;
+            const modelo = document.getElementById('vehiculo_modelo').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un vehículo para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation ActualizarVehiculo($id: ID!, $input: VehiculoInput!) {
+                    actualizarVehiculo(id_vehiculo: $id, input: $input) {
+                        id_vehiculo
+                        marca
+                        modelo
+                        anio
+                        placa
+                        tipo_id
+                        estado
+                        updated_at
+                    }
+                }
+            `;
+
+            const variables = {
+                id: id,
+                input: {
+                    marca: marca + "_actualizado",
+                    modelo: modelo + "_modificado",
+                    anio: 2024,
+                    placa: "XYZ789",
+                    tipo_id: "SUV",
+                    estado: "En Mantenimiento"
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: actualizarVehiculo (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Vehículo actualizado: ${JSON.stringify(result.data.actualizarVehiculo)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket VehiculoActualizado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al actualizar vehículo: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteVehiculo() {
+            const id = document.getElementById('vehiculo_delete_id').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea un vehículo para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation EliminarVehiculo($id: ID!) {
+                    eliminarVehiculo(id_vehiculo: $id) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const variables = { id: id };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: eliminarVehiculo (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Vehículo eliminado: ${JSON.stringify(result.data.eliminarVehiculo)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket VehiculoEliminado...`, 'info');
+                    
+                    document.getElementById('vehiculo_update_id').value = '';
+                    document.getElementById('vehiculo_delete_id').value = '';
+                    lastCreatedVehiculoId = null;
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al eliminar vehículo: ${error.message}`, 'error');
+            }
+        }
+
+        // === SUCURSALES ===
+        async function createSucursal() {
+            const nombre = document.getElementById('sucursal_nombre').value;
+            const direccion = document.getElementById('sucursal_direccion').value;
+            const ciudad = document.getElementById('sucursal_ciudad').value;
+            const telefono = document.getElementById('sucursal_telefono').value;
+
+            const mutation = `
+                mutation CrearSucursal($input: SucursalInput!) {
+                    crearSucursal(input: $input) {
+                        id_sucursal
+                        nombre
+                        direccion
+                        ciudad
+                        telefono
+                        created_at
+                    }
+                }
+            `;
+
+            const variables = {
+                input: { nombre, direccion, ciudad, telefono }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: crearSucursal`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    const sucursalData = result.data.crearSucursal;
+                    lastCreatedSucursalId = sucursalData.id_sucursal;
+                    
+                    document.getElementById('sucursal_update_id').value = lastCreatedSucursalId;
+                    document.getElementById('sucursal_delete_id').value = lastCreatedSucursalId;
+                    // Actualizar campos de otras entidades que referencian sucursal
+                    const vsSucursalField = document.getElementById('vs_sucursal_id');
+                    if (vsSucursalField) vsSucursalField.value = lastCreatedSucursalId;
+                    
+                    logEvent(`✅ Sucursal creada: ${JSON.stringify(sucursalData)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket SucursalCreada...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al crear sucursal: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateSucursal() {
+            const id = document.getElementById('sucursal_update_id').value;
+            const nombre = document.getElementById('sucursal_nombre').value;
+            const direccion = document.getElementById('sucursal_direccion').value;
+            const ciudad = document.getElementById('sucursal_ciudad').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea una sucursal para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation ActualizarSucursal($id: ID!, $input: SucursalInput!) {
+                    actualizarSucursal(id_sucursal: $id, input: $input) {
+                        id_sucursal
+                        nombre
+                        direccion
+                        ciudad
+                        telefono
+                        updated_at
+                    }
+                }
+            `;
+
+            const variables = {
+                id: id,
+                input: {
+                    nombre: nombre + "_actualizada",
+                    direccion: direccion + " (nueva dirección)",
+                    ciudad: ciudad + "_actualizada",
+                    telefono: "999888777"
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: actualizarSucursal (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Sucursal actualizada: ${JSON.stringify(result.data.actualizarSucursal)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket SucursalActualizada...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al actualizar sucursal: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteSucursal() {
+            const id = document.getElementById('sucursal_delete_id').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea una sucursal para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation EliminarSucursal($id: ID!) {
+                    eliminarSucursal(id_sucursal: $id) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const variables = { id: id };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: eliminarSucursal (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Sucursal eliminada: ${JSON.stringify(result.data.eliminarSucursal)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket SucursalEliminada...`, 'info');
+                    
+                    document.getElementById('sucursal_update_id').value = '';
+                    document.getElementById('sucursal_delete_id').value = '';
+                    lastCreatedSucursalId = null;
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al eliminar sucursal: ${error.message}`, 'error');
+            }
+        }
+
+        // === VEHÍCULO-SUCURSAL ===
+        async function createVehiculoSucursal() {
+            const vehiculo_id = parseInt(document.getElementById('vs_vehiculo_id').value);
+            const sucursal_id = parseInt(document.getElementById('vs_sucursal_id').value);
+            const fecha_asignacion = document.getElementById('vs_fecha_asignacion').value;
+
+            // Validar que los campos requeridos no estén vacíos
+            if (!vehiculo_id || isNaN(vehiculo_id)) {
+                logEvent(`❌ Error: ID de vehículo inválido`, 'error');
+                return;
+            }
+            
+            if (!sucursal_id || isNaN(sucursal_id)) {
+                logEvent(`❌ Error: ID de sucursal inválido`, 'error');
+                return;
+            }
+            
+            if (!fecha_asignacion) {
+                logEvent(`❌ Error: Fecha de asignación es requerida`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation CrearVehiculoSucursal($input: VehiculoSucursalInput!) {
+                    crearVehiculoSucursal(input: $input) {
+                        id
+                        id_vehiculo
+                        id_sucursal
+                        fecha_asignacion
+                        created_at
+                    }
+                }
+            `;
+
+            const variables = {
+                input: { 
+                    id_vehiculo: vehiculo_id, 
+                    id_sucursal: sucursal_id, 
+                    fecha_asignacion: fecha_asignacion
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: crearVehiculoSucursal`, 'info');
+                logEvent(`📝 Variables: ${JSON.stringify(variables)}`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    const vsData = result.data.crearVehiculoSucursal;
+                    lastCreatedVSId = vsData.id;
+                    
+                    document.getElementById('vs_update_id').value = lastCreatedVSId;
+                    document.getElementById('vs_delete_id').value = lastCreatedVSId;
+                    
+                    logEvent(`✅ Asignación creada: ${JSON.stringify(vsData)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket VehiculoSucursalCreado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al crear asignación: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateVehiculoSucursal() {
+            const id = document.getElementById('vs_update_id').value;
+            const vehiculo_id = parseInt(document.getElementById('vs_vehiculo_id').value);
+            const sucursal_id = parseInt(document.getElementById('vs_sucursal_id').value);
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea una asignación para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation ActualizarVehiculoSucursal($id: ID!, $input: VehiculoSucursalInput!) {
+                    actualizarVehiculoSucursal(id: $id, input: $input) {
+                        id
+                        id_vehiculo
+                        id_sucursal
+                        fecha_asignacion
+                        updated_at
+                    }
+                }
+            `;
+
+            const variables = {
+                id: id,
+                input: {
+                    id_vehiculo: vehiculo_id || lastCreatedVehiculoId || 1,
+                    id_sucursal: sucursal_id || lastCreatedSucursalId || 1,
+                    fecha_asignacion: new Date().toISOString().split('T')[0] // Fecha actual
+                }
+            };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: actualizarVehiculoSucursal (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Asignación actualizada: ${JSON.stringify(result.data.actualizarVehiculoSucursal)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket VehiculoSucursalActualizado...`, 'info');
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al actualizar asignación: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteVehiculoSucursal() {
+            const id = document.getElementById('vs_delete_id').value;
+
+            if (!id) {
+                logEvent(`❌ Error: Primero crea una asignación para obtener un ID válido`, 'error');
+                return;
+            }
+
+            const mutation = `
+                mutation EliminarVehiculoSucursal($id: ID!) {
+                    eliminarVehiculoSucursal(id: $id) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const variables = { id: id };
+
+            try {
+                logEvent(`🚀 Enviando GraphQL mutation: eliminarVehiculoSucursal (ID: ${id})`, 'info');
+                
+                const response = await fetch('http://127.0.0.1:8000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+
+                const result = await response.json();
+                
+                if (result.errors) {
+                    logEvent(`❌ Error GraphQL: ${JSON.stringify(result.errors)}`, 'error');
+                } else {
+                    logEvent(`✅ Asignación eliminada: ${JSON.stringify(result.data.eliminarVehiculoSucursal)}`, 'success');
+                    logEvent(`👀 Esperando evento WebSocket VehiculoSucursalEliminado...`, 'info');
+                    
+                    document.getElementById('vs_update_id').value = '';
+                    document.getElementById('vs_delete_id').value = '';
+                    lastCreatedVSId = null;
+                }
+
+            } catch (error) {
+                logEvent(`🚨 Error al eliminar asignación: ${error.message}`, 'error');
+            }
+        }
+
+        // === FLUJO COMPLETO AUTOMATIZADO ===
+        async function crearFlujocompleto() {
+            logEvent('🚀 Iniciando flujo completo de creación...', 'info');
+            
+            try {
+                // 1. Crear Sucursal
+                logEvent('📍 Paso 1/6: Creando Sucursal...', 'info');
+                await createSucursal();
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo
+                
+                // 2. Crear Rol
+                logEvent('📍 Paso 2/6: Creando Rol...', 'info');
+                await createRol();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 3. Crear Empleado
+                logEvent('📍 Paso 3/6: Creando Empleado...', 'info');
+                await createEmpleado();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 4. Crear Usuario
+                logEvent('📍 Paso 4/6: Creando Usuario...', 'info');
+                await createUser();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 5. Crear Vehículo
+                logEvent('📍 Paso 5/6: Creando Vehículo...', 'info');
+                await createVehiculo();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 6. Crear Asignación Vehículo-Sucursal
+                logEvent('📍 Paso 6/6: Creando Asignación Vehículo-Sucursal...', 'info');
+                await createVehiculoSucursal();
+                
+                logEvent('🎉 ¡Flujo completo ejecutado exitosamente!', 'success');
+                logEvent('✅ Todas las entidades han sido creadas y los eventos WebSocket enviados', 'success');
+                
+            } catch (error) {
+                logEvent(`🚨 Error en el flujo completo: ${error.message}`, 'error');
+                logEvent('💡 Verifica que Laravel Reverb esté corriendo y la base de datos conectada', 'info');
+            }
+        }
+
+        // Funciones de utilidad
+        function generateUniqueUsername() {
+            const timestamp = Date.now();
+            const randomNum = Math.floor(Math.random() * 1000);
+            const username = `user_${timestamp}_${randomNum}`;
+            document.getElementById('username').value = username;
+            logEvent(`🎲 Username único generado: ${username}`, 'info');
+        }
+
+        function generateEmpleadoData() {
+            const timestamp = Date.now();
+            const randomNum = Math.floor(Math.random() * 1000);
+            const nombres = ['Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Carmen', 'Pedro', 'Sofía'];
+            const cargos = ['Administrador', 'Gerente', 'Coordinador', 'Supervisor', 'Asistente', 'Analista'];
+            
+            const nombre = nombres[Math.floor(Math.random() * nombres.length)] + ' ' + nombres[Math.floor(Math.random() * nombres.length)];
+            const cargo = cargos[Math.floor(Math.random() * cargos.length)];
+            const correo = `${nombre.split(' ')[0].toLowerCase()}.${cargo.toLowerCase()}${randomNum}@empresa.com`;
+            const telefono = `9${randomNum.toString().padStart(8, '0')}`;
+            
+            document.getElementById('empleado_nombre').value = nombre;
+            document.getElementById('empleado_cargo').value = cargo;
+            document.getElementById('empleado_correo').value = correo;
+            document.getElementById('empleado_telefono').value = telefono;
+            
+            logEvent(`🎲 Datos de empleado generados: ${nombre}`, 'info');
+        }
+
+        function generateRolData() {
+            const timestamp = Date.now();
+            const randomNum = Math.floor(Math.random() * 1000);
+            const roles = ['Administrador', 'Supervisor', 'Operador', 'Gerente', 'Analista', 'Coordinador'];
+            const rol = roles[Math.floor(Math.random() * roles.length)];
+            
+            document.getElementById('rol_nombre').value = `${rol}_${randomNum}`;
+            document.getElementById('rol_descripcion').value = `Rol ${rol} con responsabilidades específicas del área`;
+            
+            logEvent(`🎲 Datos de rol generados: ${rol}_${randomNum}`, 'info');
+        }
+
+        function generateVehiculoData() {
+            const timestamp = Date.now();
+            const randomNum = Math.floor(Math.random() * 1000);
+            const marcas = ['Toyota', 'Ford', 'Chevrolet', 'Nissan', 'Honda', 'Volkswagen', 'Hyundai'];
+            const modelos = ['Corolla', 'Focus', 'Cruze', 'Sentra', 'Civic', 'Jetta', 'Elantra'];
+            
+            const marca = marcas[Math.floor(Math.random() * marcas.length)];
+            const modelo = modelos[Math.floor(Math.random() * modelos.length)];
+            const año = 2020 + Math.floor(Math.random() * 5);
+            const patente = `${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${randomNum.toString().slice(-3)}`;
+            
+            document.getElementById('vehiculo_marca').value = marca;
+            document.getElementById('vehiculo_modelo').value = modelo;
+            document.getElementById('vehiculo_año').value = año;
+            document.getElementById('vehiculo_patente').value = patente;
+            
+            logEvent(`🎲 Datos de vehículo generados: ${marca} ${modelo} ${patente}`, 'info');
+        }
+
+        function generateSucursalData() {
+            const timestamp = Date.now();
+            const randomNum = Math.floor(Math.random() * 1000);
+            const ciudades = ['Centro', 'Norte', 'Sur', 'Este', 'Oeste', 'Plaza', 'Mall', 'Principal'];
+            const calles = ['Av. Principal', 'Calle Central', 'Av. Libertador', 'Calle Comercio', 'Av. Industrial'];
+            
+            const ciudad = ciudades[Math.floor(Math.random() * ciudades.length)];
+            const calle = calles[Math.floor(Math.random() * calles.length)];
+            const numero = 100 + Math.floor(Math.random() * 900);
+            
+            document.getElementById('sucursal_nombre').value = `Sucursal ${ciudad}_${randomNum}`;
+            document.getElementById('sucursal_direccion').value = `${calle} ${numero}`;
+            document.getElementById('sucursal_ciudad').value = `Ciudad ${ciudad}`;
+            document.getElementById('sucursal_telefono').value = `2${randomNum.toString().padStart(8, '0')}`;
+            
+            logEvent(`🎲 Datos de sucursal generados: Sucursal ${ciudad}_${randomNum}`, 'info');
+        }
+
+        function generateVSData() {
+            const fechaAsignacion = new Date().toISOString().split('T')[0];
+            
+            // Generar IDs aleatorios para vehículo y sucursal si están vacíos
+            const vehiculoIdField = document.getElementById('vs_vehiculo_id');
+            const sucursalIdField = document.getElementById('vs_sucursal_id');
+            
+            if (!vehiculoIdField.value || vehiculoIdField.value === '') {
+                vehiculoIdField.value = lastCreatedVehiculoId || Math.floor(Math.random() * 50) + 1;
+            }
+            
+            if (!sucursalIdField.value || sucursalIdField.value === '') {
+                sucursalIdField.value = lastCreatedSucursalId || Math.floor(Math.random() * 50) + 1;
+            }
+            
+            document.getElementById('vs_fecha_asignacion').value = fechaAsignacion;
+            
+            logEvent(`🎲 Datos de asignación generados - Vehículo: ${vehiculoIdField.value}, Sucursal: ${sucursalIdField.value}, Fecha: ${fechaAsignacion}`, 'info');
+        }
+
+        function updateConnectionStatus(status, className) {
+            const statusElement = document.getElementById('connection-status');
+            statusElement.textContent = status;
+            statusElement.className = `status ${className}`;
+        }
+
+        function updateActiveChannels() {
+            const channelsList = Object.keys(channels).join(', ') || 'Ninguno';
+            document.getElementById('active-channels').textContent = channelsList;
+        }
+
+        function logEvent(message, type = 'info') {
+            const eventsLog = document.getElementById('events-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event ${type}`;
+            eventDiv.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            eventsLog.appendChild(eventDiv);
+            eventsLog.scrollTop = eventsLog.scrollHeight;
+        }
+
+        function clearEvents() {
+            document.getElementById('events-log').innerHTML = '';
+        }
+
+        // Funciones de diagnóstico
+        function testConnection() {
+            logEvent('🔧 Iniciando diagnóstico de conexión...', 'info');
+            logEvent('📝 Configuración actual:', 'info');
+            logEvent('   Host: 127.0.0.1', 'info');
+            logEvent('   Puerto: 8080', 'info');
+            logEvent('   App Key: gzbmxzp7oozsmb8cor5t', 'info');
+            logEvent('   Protocolo: WebSocket (ws://)', 'info');
+            
+            // Test de conectividad básica
+            checkServerStatus();
+        }
+
+        async function checkServerStatus() {
+            logEvent('📡 Verificando estado del servidor...', 'info');
+            
+            try {
+                // Test simple de fetch al servidor Laravel
+                const response = await fetch('http://127.0.0.1:8000/', {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                logEvent('✅ Servidor Laravel está respondiendo en puerto 8000', 'success');
+            } catch (error) {
+                logEvent('❌ Servidor Laravel no responde en puerto 8000', 'error');
+                logEvent('💡 Ejecuta: php artisan serve', 'info');
+            }
+
+            // Test de puerto WebSocket
+            try {
+                const testSocket = new WebSocket('ws://127.0.0.1:8080/app/gzbmxzp7oozsmb8cor5t');
+                
+                testSocket.onopen = function() {
+                    logEvent('✅ Puerto 8080 está abierto y responde WebSocket', 'success');
+                    logEvent('✅ Laravel Reverb está funcionando correctamente', 'success');
+                    testSocket.close();
+                };
+                
+                testSocket.onerror = function(error) {
+                    logEvent('❌ No se puede conectar al puerto 8080', 'error');
+                    logEvent('💡 Soluciones:', 'info');
+                    logEvent('   1. Ejecuta: php artisan reverb:start', 'info');
+                    logEvent('   2. Verifica que no haya firewall bloqueando el puerto', 'info');
+                    logEvent('   3. Verifica la configuración en .env:', 'info');
+                    logEvent('      BROADCAST_CONNECTION=reverb', 'info');
+                    logEvent('      REVERB_APP_KEY=gzbmxzp7oozsmb8cor5t', 'info');
+                    logEvent('      REVERB_HOST=127.0.0.1', 'info');
+                    logEvent('      REVERB_PORT=8080', 'info');
+                };
+                
+                testSocket.onclose = function() {
+                    logEvent('🔌 Test de conexión WebSocket completado', 'info');
+                };
+                
+            } catch (error) {
+                logEvent('❌ Error al crear WebSocket de prueba: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-conectar al cargar la página
+        window.onload = function() {
+            logEvent('🌐 Página cargada. Ejecutando diagnóstico automático...', 'info');
+            
+            // Generar datos automáticamente para todas las entidades
+            generateUniqueUsername();
+            generateEmpleadoData();
+            generateRolData();
+            generateVehiculoData();
+            generateSucursalData();
+            generateVSData();
+            
+            logEvent('🎲 Datos automáticos generados para todas las entidades', 'success');
+            
+            // Diagnóstico automático al cargar
+            setTimeout(() => {
+                testConnection();
+            }, 1000);
+            
+            // Conectar automáticamente después del diagnóstico
+            setTimeout(() => {
+                logEvent('🔌 Conectando automáticamente...', 'info');
+                connect();
+            }, 2000);
+            
+            // Suscribirse automáticamente a todos los canales
+            setTimeout(() => {
+                subscribeToAllChannels();
+            }, 4000);
+        };
+
+        // Variables para el sistema de eventos mejorado
+        let eventCounter = 0;
+        let showEventDetails = true;
+        let eventLog = [];
+
+        // Función mejorada logEvent que cuenta eventos
+        const originalLogEvent = logEvent;
+        logEvent = function(message, type) {
+            if (type === 'success' && message.includes('EVENTO RECIBIDO')) {
+                eventCounter++;
+                document.getElementById('event-counter').textContent = `Eventos: ${eventCounter}`;
+                
+                // Guardar en el log
+                eventLog.push({
+                    timestamp: new Date().toISOString(),
+                    message: message,
+                    type: type
+                });
+            }
+            return originalLogEvent(message, type);
+        };
+
+        // Función para exportar log
+        function exportLog() {
+            const logData = {
+                session: new Date().toISOString(),
+                total_events: eventCounter,
+                events: eventLog,
+                connection_info: {
+                    socket_id: pusher ? pusher.connection.socket_id : 'N/A',
+                    state: pusher ? pusher.connection.state : 'N/A'
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `websocket-log-${new Date().toISOString().slice(0, 19)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            logEvent(`📥 Log exportado: ${eventCounter} eventos`, 'info');
+        }
+
+        // Función para toggle detalles
+        function toggleEventDetails() {
+            showEventDetails = !showEventDetails;
+            const button = document.querySelector('button[onclick="toggleEventDetails()"]');
+            button.textContent = showEventDetails ? '🔍 Ocultar Detalles' : '🔍 Mostrar Detalles';
+            logEvent(`🔍 Detalles de eventos: ${showEventDetails ? 'Activados' : 'Desactivados'}`, 'info');
+        }
+
+        // Mejorar clearEvents para resetear contador
+        const originalClearEvents = clearEvents;
+        clearEvents = function() {
+            eventCounter = 0;
+            eventLog = [];
+            document.getElementById('event-counter').textContent = 'Eventos: 0';
+            return originalClearEvents();
+        };
+
+        // Monitor de eventos en tiempo real
+        function startEventMonitor() {
+            setInterval(() => {
+                if (pusher && pusher.connection) {
+                    const connectionInfo = {
+                        state: pusher.connection.state,
+                        socket_id: pusher.connection.socket_id,
+                        events_received: eventCounter
+                    };
+                    
+                    // Actualizar info en tiempo real (opcional, solo para debug)
+                    console.log('📊 WebSocket Status:', connectionInfo);
+                }
+            }, 30000); // Cada 30 segundos
+        }
+
+        // Iniciar monitor cuando se conecte
+        if (pusher) {
+            pusher.connection.bind('connected', startEventMonitor);
+        }
+    </script>
+</body>
+</html>

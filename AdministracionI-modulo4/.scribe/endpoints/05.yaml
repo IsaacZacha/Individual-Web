@@ -1,0 +1,397 @@
+name: Empleados
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/empleados
+    metadata:
+      groupName: Empleados
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Obtener todos los empleados.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          [
+            {
+              "id_empleado": 1,
+              "nombre": "Juan Pérez",
+              "cargo": "Gerente",
+              "correo": "juan@empresa.com",
+              "telefono": "0999999999"
+            }
+          ]
+        headers: []
+        description: 'Listado de empleados'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/empleados
+    metadata:
+      groupName: Empleados
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Crear un nuevo empleado.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nombre:
+        name: nombre
+        description: 'Nombre del empleado.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      cargo:
+        name: cargo
+        description: 'Cargo del empleado.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      correo:
+        name: correo
+        description: 'Correo electrónico.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      telefono:
+        name: telefono
+        description: Teléfono.
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      nombre: consequatur
+      cargo: consequatur
+      correo: consequatur
+      telefono: consequatur
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: |-
+          {
+            "id_empleado": 2,
+            "nombre": "Ana López",
+            "cargo": "Asistente",
+            "correo": "ana@empresa.com",
+            "telefono": "0988888888"
+          }
+        headers: []
+        description: 'Empleado creado'
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "Campos inválidos o faltantes",
+            "errors": {
+              "nombre": {"El campo nombre es obligatorio."}
+            }
+          }
+        headers: []
+        description: 'Campos inválidos o faltantes'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/empleados/{id_empleado}'
+    metadata:
+      groupName: Empleados
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Mostrar un empleado específico.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id_empleado:
+        name: id_empleado
+        description: 'El ID del empleado.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id_empleado: 17
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "id_empleado": 1,
+            "nombre": "Juan Pérez",
+            "cargo": "Gerente",
+            "correo": "juan@empresa.com",
+            "telefono": "0999999999"
+          }
+        headers: []
+        description: 'Empleado encontrado'
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "message": "Empleado no encontrado"
+          }
+        headers: []
+        description: 'No encontrado'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/empleados/{id_empleado}'
+    metadata:
+      groupName: Empleados
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Actualizar un empleado.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id_empleado:
+        name: id_empleado
+        description: 'El ID del empleado.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id_empleado: 17
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nombre:
+        name: nombre
+        description: 'Nombre del empleado.'
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      cargo:
+        name: cargo
+        description: 'Cargo del empleado.'
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      correo:
+        name: correo
+        description: 'Correo electrónico.'
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      telefono:
+        name: telefono
+        description: Teléfono.
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      nombre: consequatur
+      cargo: consequatur
+      correo: consequatur
+      telefono: consequatur
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "id_empleado": 1,
+            "nombre": "Juan Pérez",
+            "cargo": "Director",
+            "correo": "juan@empresa.com",
+            "telefono": "0999999999"
+          }
+        headers: []
+        description: 'Empleado actualizado'
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "Campos inválidos o faltantes",
+            "errors": {
+              "nombre": {"El campo nombre es obligatorio."}
+            }
+          }
+        headers: []
+        description: 'Campos inválidos o faltantes'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/empleados/{id_empleado}'
+    metadata:
+      groupName: Empleados
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Eliminar un empleado.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id_empleado:
+        name: id_empleado
+        description: 'El ID del empleado.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id_empleado: 17
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 204
+        content: '{}'
+        headers: []
+        description: 'Empleado eliminado'
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "message": "Empleado no encontrado"
+          }
+        headers: []
+        description: 'No encontrado'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []

@@ -1,0 +1,430 @@
+name: Sucursales
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/sucursales
+    metadata:
+      groupName: Sucursales
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Listar todas las sucursales.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          [
+            {
+              "id_sucursal": 1,
+              "nombre": "Sucursal Norte",
+              "direccion": "Av. Principal 123",
+              "ciudad": "Quito",
+              "telefono": "022345678"
+            }
+          ]
+        headers: []
+        description: 'Listado de sucursales'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/sucursales
+    metadata:
+      groupName: Sucursales
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Crear una nueva sucursal.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nombre:
+        name: nombre
+        description: 'Nombre de la sucursal.'
+        required: true
+        example: 'Sucursal Norte'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      direccion:
+        name: direccion
+        description: 'Dirección de la sucursal.'
+        required: true
+        example: 'Av. Principal 123'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      ciudad:
+        name: ciudad
+        description: 'Ciudad de la sucursal.'
+        required: true
+        example: Quito
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      telefono:
+        name: telefono
+        description: 'Teléfono de la sucursal.'
+        required: true
+        example: '022345678'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      nombre: 'Sucursal Norte'
+      direccion: 'Av. Principal 123'
+      ciudad: Quito
+      telefono: '022345678'
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: |-
+          {
+            "id_sucursal": 2,
+            "nombre": "Sucursal Sur",
+            "direccion": "Av. Secundaria 456",
+            "ciudad": "Guayaquil",
+            "telefono": "022345679"
+          }
+        headers: []
+        description: 'Sucursal creada'
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "Campos inválidos o faltantes",
+            "errors": {
+              "nombre": {"El campo nombre es obligatorio."}
+            }
+          }
+        headers: []
+        description: 'Campos inválidos o faltantes'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/sucursales/{id}'
+    metadata:
+      groupName: Sucursales
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Mostrar una sucursal específica.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the sucursale.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      id_sucursal:
+        name: id_sucursal
+        description: 'El ID de la sucursal.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: consequatur
+      id_sucursal: 17
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "id_sucursal": 1,
+            "nombre": "Sucursal Norte",
+            "direccion": "Av. Principal 123",
+            "ciudad": "Quito",
+            "telefono": "022345678"
+          }
+        headers: []
+        description: 'Sucursal encontrada'
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "message": "Sucursal no encontrada"
+          }
+        headers: []
+        description: 'Sucursal no encontrada'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/sucursales/{id}'
+    metadata:
+      groupName: Sucursales
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Actualizar una sucursal.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the sucursale.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      id_sucursal:
+        name: id_sucursal
+        description: 'El ID de la sucursal.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: consequatur
+      id_sucursal: 17
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nombre:
+        name: nombre
+        description: 'Nombre de la sucursal.'
+        required: false
+        example: 'Sucursal Norte'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      direccion:
+        name: direccion
+        description: 'Dirección de la sucursal.'
+        required: false
+        example: 'Av. Principal 123'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      ciudad:
+        name: ciudad
+        description: 'Ciudad de la sucursal.'
+        required: false
+        example: Quito
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      telefono:
+        name: telefono
+        description: 'Teléfono de la sucursal.'
+        required: false
+        example: '022345678'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      nombre: 'Sucursal Norte'
+      direccion: 'Av. Principal 123'
+      ciudad: Quito
+      telefono: '022345678'
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "id_sucursal": 1,
+            "nombre": "Sucursal Norte",
+            "direccion": "Av. Principal 123",
+            "ciudad": "Quito",
+            "telefono": "022345678"
+          }
+        headers: []
+        description: 'Sucursal actualizada'
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "Campos inválidos o faltantes",
+            "errors": {
+              "nombre": {"El campo nombre es obligatorio."}
+            }
+          }
+        headers: []
+        description: 'Campos inválidos o faltantes'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/sucursales/{id}'
+    metadata:
+      groupName: Sucursales
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Eliminar una sucursal.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the sucursale.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      id_sucursal:
+        name: id_sucursal
+        description: 'El ID de la sucursal.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: consequatur
+      id_sucursal: 17
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 204
+        content: '{}'
+        headers: []
+        description: 'Sucursal eliminada'
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "message": "Sucursal no encontrada"
+          }
+        headers: []
+        description: 'Sucursal no encontrada'
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []

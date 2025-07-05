@@ -1,0 +1,496 @@
+{
+	"info": {
+		"name": "Laravel GraphQL & WebSocket - Sistema Administración",
+		"description": "Colección completa para testing de GraphQL API y WebSocket Events",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_postman_id": "12345678-1234-1234-1234-123456789012"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "graphql_endpoint",
+			"value": "{{base_url}}/graphql",
+			"type": "string"
+		},
+		{
+			"key": "websocket_url",
+			"value": "ws://127.0.0.1:8080",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "📊 QUERIES - Consultas GraphQL",
+			"item": [
+				{
+					"name": "🏢 Estadísticas del Sistema",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { estadisticas { totalEmpleados totalVehiculos totalSucursales totalUsuarios vehiculosPorEstado { estado count } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						}
+					}
+				},
+				{
+					"name": "👥 Obtener Todos los Empleados",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { empleados { id_empleado nombre cargo correo telefono created_at } }\"\n}"
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						}
+					}
+				},
+				{
+					"name": "🚗 Obtener Todos los Vehículos",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { vehiculos { id_vehiculo placa marca modelo anio tipo_id estado created_at } }\"\n}"
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						}
+					}
+				},
+				{
+					"name": "🏢 Obtener Todas las Sucursales",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { sucursales { id_sucursal nombre direccion ciudad telefono created_at } }\"\n}"
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						}
+					}
+				},
+				{
+					"name": "👤 Obtener Todos los Usuarios",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { users { id name email email_verified_at rol_id created_at rol { nombre descripcion } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						}
+					}
+				},
+				{
+					"name": "🔗 Obtener Asignaciones Vehículo-Sucursal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { vehiculoSucursales { id id_vehiculo id_sucursal fecha_asignacion vehiculo { placa marca modelo } sucursal { nombre ciudad } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "✏️ MUTATIONS - Operaciones CRUD",
+			"item": [
+				{
+					"name": "👥 EMPLEADOS - CRUD",
+					"item": [
+						{
+							"name": "➕ Crear Empleado",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { crearEmpleado(input: { nombre: \\\"Juan Pérez\\\", cargo: \\\"Desarrollador\\\", correo: \\\"juan.perez@empresa.com\\\", telefono: \\\"555-1234\\\" }) { id_empleado nombre cargo correo telefono created_at } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "✏️ Actualizar Empleado",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { actualizarEmpleado(id_empleado: \\\"1\\\", input: { nombre: \\\"Juan Carlos Pérez\\\", cargo: \\\"Senior Developer\\\", correo: \\\"jc.perez@empresa.com\\\", telefono: \\\"555-5678\\\" }) { id_empleado nombre cargo correo telefono } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "🗑️ Eliminar Empleado",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { eliminarEmpleado(id_empleado: \\\"1\\\") { success message } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "🚗 VEHÍCULOS - CRUD",
+					"item": [
+						{
+							"name": "➕ Crear Vehículo",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { crearVehiculo(input: { placa: \\\"ABC-123\\\", marca: \\\"Toyota\\\", modelo: \\\"Corolla\\\", anio: 2024, tipo_id: \\\"sedan\\\", estado: \\\"disponible\\\" }) { id_vehiculo placa marca modelo anio tipo_id estado created_at } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "✏️ Actualizar Vehículo",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { actualizarVehiculo(id_vehiculo: \\\"1\\\", input: { placa: \\\"ABC-123\\\", marca: \\\"Toyota\\\", modelo: \\\"Corolla Hybrid\\\", anio: 2024, tipo_id: \\\"sedan\\\", estado: \\\"disponible\\\" }) { id_vehiculo placa marca modelo estado } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "🔄 Cambiar Estado Vehículo",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { cambiarEstadoVehiculo(id_vehiculo: \\\"1\\\", estado: \\\"ocupado\\\") { id_vehiculo placa estado } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "🗑️ Eliminar Vehículo",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { eliminarVehiculo(id_vehiculo: \\\"1\\\") { success message } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "🏢 SUCURSALES - CRUD",
+					"item": [
+						{
+							"name": "➕ Crear Sucursal",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { crearSucursal(input: { nombre: \\\"Sucursal Centro\\\", direccion: \\\"Av. Principal 123\\\", ciudad: \\\"Ciudad Central\\\", telefono: \\\"555-9876\\\" }) { id_sucursal nombre direccion ciudad telefono created_at } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "✏️ Actualizar Sucursal",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { actualizarSucursal(id_sucursal: \\\"1\\\", input: { nombre: \\\"Sucursal Centro Renovada\\\", direccion: \\\"Av. Principal 123 - Piso 2\\\", ciudad: \\\"Ciudad Central\\\", telefono: \\\"555-9999\\\" }) { id_sucursal nombre direccion ciudad telefono } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "🗑️ Eliminar Sucursal",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { eliminarSucursal(id_sucursal: \\\"1\\\") { success message } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "🔗 ASIGNACIONES - CRUD",
+					"item": [
+						{
+							"name": "➕ Asignar Vehículo a Sucursal",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { asignarVehiculoSucursal(input: { id_vehiculo: \\\"1\\\", id_sucursal: \\\"1\\\", fecha_asignacion: \\\"2025-07-27T06:00:00Z\\\" }) { id id_vehiculo id_sucursal fecha_asignacion vehiculo { placa marca } sucursal { nombre } } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						},
+						{
+							"name": "🗑️ Desasignar Vehículo de Sucursal",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"query\": \"mutation { desasignarVehiculoSucursal(id: \\\"1\\\") { success message } }\"\n}"
+								},
+								"url": {
+									"raw": "{{graphql_endpoint}}",
+									"host": ["{{graphql_endpoint}}"]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🔌 WEBSOCKET TESTS - Pruebas de Eventos",
+			"item": [
+				{
+					"name": "🧪 Test Evento Empleado Creado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/websocket-test/empleado-creado",
+							"host": ["{{base_url}}"],
+							"path": ["websocket-test", "empleado-creado"]
+						}
+					}
+				},
+				{
+					"name": "🧪 Test Evento Vehículo Creado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/websocket-test/vehiculo-creado",
+							"host": ["{{base_url}}"],
+							"path": ["websocket-test", "vehiculo-creado"]
+						}
+					}
+				},
+				{
+					"name": "🧪 Test Evento General",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/websocket-test/general-event",
+							"host": ["{{base_url}}"],
+							"path": ["websocket-test", "general-event"]
+						}
+					}
+				},
+				{
+					"name": "🧪 Test Múltiples Eventos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/websocket-test/multiple-events",
+							"host": ["{{base_url}}"],
+							"path": ["websocket-test", "multiple-events"]
+						}
+					}
+				},
+				{
+					"name": "📊 Estado WebSocket",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/websocket-test/status",
+							"host": ["{{base_url}}"],
+							"path": ["websocket-test", "status"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

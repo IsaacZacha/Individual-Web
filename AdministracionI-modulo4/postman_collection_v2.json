@@ -1,0 +1,530 @@
+{
+  "info": {
+    "name": "Laravel GraphQL + WebSocket API - Actualizado",
+    "description": "Colección completa actualizada con schema GraphQL exacto y variables dinámicas. ❌ WebSocket NO funciona en Postman (usa browser). ✅ GraphQL mutations funcionan perfectamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "description": "✅ URL base del servidor Laravel"
+    },
+    {
+      "key": "graphql_url",
+      "value": "{{base_url}}/graphql",
+      "description": "✅ Endpoint GraphQL funcional"
+    },
+    {
+      "key": "websocket_test_url",
+      "value": "{{base_url}}/websocket-test.html",
+      "description": "✅ Herramienta WebSocket que SÍ funciona con Laravel Reverb"
+    },
+    {
+      "key": "current_user_id",
+      "value": "1",
+      "description": "🔄 Se actualiza automáticamente con el script de testing"
+    },
+    {
+      "key": "current_empleado_id",
+      "value": "1",
+      "description": "🔄 Se actualiza automáticamente"
+    },
+    {
+      "key": "current_rol_id",
+      "value": "1",
+      "description": "🔄 Se actualiza automáticamente"
+    },
+    {
+      "key": "current_vehiculo_id",
+      "value": "1",
+      "description": "🔄 Se actualiza automáticamente"
+    },
+    {
+      "key": "current_sucursal_id",
+      "value": "1",
+      "description": "🔄 Se actualiza automáticamente"
+    },
+    {
+      "key": "testing_workflow",
+      "value": "Postman (GraphQL) + Browser (WebSocket)",
+      "description": "✅ FLUJO RECOMENDADO"
+    }
+  ],
+  "item": [
+    {
+      "name": "📋 USUARIOS - User Management",
+      "item": [
+        {
+          "name": "1. ✅ Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation CrearUser($input: UserInput!) { crearUser(input: $input) { id_usuario empleado_id username rol_id created_at } }\",\n    \"variables\": {\n        \"input\": {\n            \"empleado_id\": \"{{current_empleado_id}}\",\n            \"username\": \"usuario_{{$randomFirstName}}_{{$randomInt}}\",\n            \"password\": \"password123\",\n            \"rol_id\": \"{{current_rol_id}}\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "2. ✏️ Actualizar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation ActualizarUser($id: ID!, $input: UserInput!) { actualizarUser(id_usuario: $id, input: $input) { id_usuario username updated_at } }\",\n    \"variables\": {\n        \"id\": \"{{current_user_id}}\",\n        \"input\": {\n            \"empleado_id\": \"{{current_empleado_id}}\",\n            \"username\": \"usuario_actualizado_{{$randomInt}}\",\n            \"password\": \"newpassword123\",\n            \"rol_id\": \"{{current_rol_id}}\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "3. 🗑️ Eliminar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation EliminarUser($id: ID!) { eliminarUser(id_usuario: $id) { success message deleted_id } }\",\n    \"variables\": {\n        \"id\": \"{{current_user_id}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "4. 📋 Listar Usuarios",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"query { usuarios { id_usuario empleado_id username rol_id created_at rol { nombre } empleado { nombre } } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 EMPLEADOS - Employee Management",
+      "item": [
+        {
+          "name": "1. ✅ Crear Empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation CrearEmpleado($input: EmpleadoInput!) { crearEmpleado(input: $input) { id_empleado nombre cargo correo telefono created_at } }\",\n    \"variables\": {\n        \"input\": {\n            \"nombre\": \"{{$randomFullName}}\",\n            \"cargo\": \"{{$randomJobTitle}}\",\n            \"correo\": \"{{$randomEmail}}\",\n            \"telefono\": \"{{$randomPhoneNumber}}\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "2. ✏️ Actualizar Empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation ActualizarEmpleado($id: ID!, $input: EmpleadoInput!) { actualizarEmpleado(id_empleado: $id, input: $input) { id_empleado nombre cargo correo telefono updated_at } }\",\n    \"variables\": {\n        \"id\": \"{{current_empleado_id}}\",\n        \"input\": {\n            \"nombre\": \"{{$randomFullName}} ACTUALIZADO\",\n            \"cargo\": \"{{$randomJobTitle}} Modificado\",\n            \"correo\": \"actualizado_{{$randomEmail}}\",\n            \"telefono\": \"999{{$randomInt}}\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "3. 🗑️ Eliminar Empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation EliminarEmpleado($id: ID!) { eliminarEmpleado(id_empleado: $id) { success message deleted_id } }\",\n    \"variables\": {\n        \"id\": \"{{current_empleado_id}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "4. 📋 Listar Empleados",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"query { empleados { id_empleado nombre cargo correo telefono created_at } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚗 VEHÍCULOS - Vehicle Management",
+      "item": [
+        {
+          "name": "1. ✅ Crear Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation CrearVehiculo($input: VehiculoInput!) { crearVehiculo(input: $input) { id_vehiculo placa marca modelo anio tipo_id estado created_at } }\",\n    \"variables\": {\n        \"input\": {\n            \"placa\": \"{{$randomAlphaNumeric}}{{$randomAlphaNumeric}}{{$randomAlphaNumeric}}-{{$randomInt}}\",\n            \"marca\": \"Toyota\",\n            \"modelo\": \"Corolla\",\n            \"anio\": 2023,\n            \"tipo_id\": \"Sedan\",\n            \"estado\": \"Disponible\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "2. ✏️ Actualizar Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation ActualizarVehiculo($id: ID!, $input: VehiculoInput!) { actualizarVehiculo(id_vehiculo: $id, input: $input) { id_vehiculo placa marca modelo anio tipo_id estado updated_at } }\",\n    \"variables\": {\n        \"id\": \"{{current_vehiculo_id}}\",\n        \"input\": {\n            \"placa\": \"UPD-{{$randomInt}}\",\n            \"marca\": \"Honda\",\n            \"modelo\": \"Civic\",\n            \"anio\": 2024,\n            \"tipo_id\": \"Hatchback\",\n            \"estado\": \"En Mantenimiento\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "3. 🗑️ Eliminar Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation EliminarVehiculo($id: ID!) { eliminarVehiculo(id_vehiculo: $id) { success message deleted_id } }\",\n    \"variables\": {\n        \"id\": \"{{current_vehiculo_id}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "4. 📋 Listar Vehículos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"query { vehiculos { id_vehiculo placa marca modelo anio tipo_id estado created_at } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 SUCURSALES - Branch Management",
+      "item": [
+        {
+          "name": "1. ✅ Crear Sucursal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation CrearSucursal($input: SucursalInput!) { crearSucursal(input: $input) { id_sucursal nombre direccion ciudad telefono created_at } }\",\n    \"variables\": {\n        \"input\": {\n            \"nombre\": \"Sucursal {{$randomCity}}\",\n            \"direccion\": \"{{$randomStreetAddress}}\",\n            \"ciudad\": \"{{$randomCity}}\",\n            \"telefono\": \"{{$randomPhoneNumber}}\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "2. ✏️ Actualizar Sucursal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation ActualizarSucursal($id: ID!, $input: SucursalInput!) { actualizarSucursal(id_sucursal: $id, input: $input) { id_sucursal nombre direccion ciudad telefono updated_at } }\",\n    \"variables\": {\n        \"id\": \"{{current_sucursal_id}}\",\n        \"input\": {\n            \"nombre\": \"Sucursal {{$randomCity}} ACTUALIZADA\",\n            \"direccion\": \"{{$randomStreetAddress}} - Modificada\",\n            \"ciudad\": \"{{$randomCity}}\",\n            \"telefono\": \"999{{$randomInt}}\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "3. 🗑️ Eliminar Sucursal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation EliminarSucursal($id: ID!) { eliminarSucursal(id_sucursal: $id) { success message deleted_id } }\",\n    \"variables\": {\n        \"id\": \"{{current_sucursal_id}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "4. 📋 Listar Sucursales",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"query { sucursales { id_sucursal nombre direccion ciudad telefono created_at } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 ROLES - Role Management",
+      "item": [
+        {
+          "name": "1. ✅ Crear Rol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation CrearRol($input: RolInput!) { crearRol(input: $input) { id_rol nombre descripcion created_at } }\",\n    \"variables\": {\n        \"input\": {\n            \"nombre\": \"{{$randomJobArea}}\",\n            \"descripcion\": \"Rol para {{$randomJobArea}} con permisos específicos\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "2. ✏️ Actualizar Rol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation ActualizarRol($id: ID!, $input: RolInput!) { actualizarRol(id_rol: $id, input: $input) { id_rol nombre descripcion updated_at } }\",\n    \"variables\": {\n        \"id\": \"{{current_rol_id}}\",\n        \"input\": {\n            \"nombre\": \"{{$randomJobArea}} ACTUALIZADO\",\n            \"descripcion\": \"Rol modificado para {{$randomJobArea}} con nuevos permisos\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "3. 🗑️ Eliminar Rol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation EliminarRol($id: ID!) { eliminarRol(id_rol: $id) { success message deleted_id } }\",\n    \"variables\": {\n        \"id\": \"{{current_rol_id}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "4. 📋 Listar Roles",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"query { roles { id_rol nombre descripcion created_at } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔗 ASIGNACIONES - Vehicle-Branch Assignment",
+      "item": [
+        {
+          "name": "1. ✅ Crear Asignación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"mutation CrearVehiculoSucursal($input: VehiculoSucursalInput!) { crearVehiculoSucursal(input: $input) { id id_vehiculo id_sucursal fecha_asignacion created_at } }\",\n    \"variables\": {\n        \"input\": {\n            \"id_vehiculo\": \"{{current_vehiculo_id}}\",\n            \"id_sucursal\": \"{{current_sucursal_id}}\",\n            \"fecha_asignacion\": \"{{$isoTimestamp}}\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        },
+        {
+          "name": "2. 📋 Listar Asignaciones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"query { vehiculoSucursales { id id_vehiculo id_sucursal fecha_asignacion created_at vehiculo { placa marca modelo } sucursal { nombre ciudad } } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
