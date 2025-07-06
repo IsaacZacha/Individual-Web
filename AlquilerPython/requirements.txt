@@ -1,0 +1,22 @@
+# FastAPI y componentes principales
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Base de datos
+sqlalchemy==2.0.23
+asyncpg==0.29.0
+
+# WebSockets
+websockets==12.0
+
+# Validación y serialización (versiones sin compilación)
+pydantic==2.4.2
+pydantic-settings==2.0.3
+
+# Testing
+pytest==7.4.3
+httpx==0.25.2
+
+# Utilidades
+python-dotenv==1.0.0
+python-multipart==0.0.6
