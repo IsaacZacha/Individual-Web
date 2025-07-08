@@ -16,7 +16,14 @@ builder.Services
     .AddProjections()
     .AddFiltering()
     .AddSorting()
-    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true)
+    .ModifyRequestOptions(
+        opt =>
+        {
+            opt.IncludeExceptionDetails = true;
+        }
+
+        )
+
     .RegisterDbContext<AppDbContext>(DbContextKind.Pooled);
 
 var app = builder.Build();
