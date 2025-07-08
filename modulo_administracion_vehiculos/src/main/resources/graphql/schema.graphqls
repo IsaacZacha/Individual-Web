@@ -6,23 +6,20 @@ type Vehiculo {
     anio: Int!
     tipo: TipoVehiculo!
     estado: String!
-    mantenimientos: [Mantenimiento!]!
-    seguros: [Seguro!]!
-    combustibles: [Combustible!]!
 }
 
 type TipoVehiculo {
     id: ID!
     descripcion: String!
-    capacidad: Int!
+    capacidad: String!
     transmision: String!
 }
 
 type Mantenimiento {
     id: ID!
     vehiculo: Vehiculo!
-    fecha_inicio: String!
-    fecha_fin: String!
+    fechaInicio: String!
+    fechaFin: String!
     descripcion: String!
     costo: Float!
 }
@@ -31,29 +28,26 @@ type Seguro {
     id: ID!
     vehiculo: Vehiculo!
     compania: String!
-    tipo_cobertura: String!
-    fecha_inicio: String!
-    fecha_fin: String!
+    tipoCobertura: String!
+    fechaInicio: String!
+    fechaFin: String!
 }
 
 type Combustible {
     id: ID!
     vehiculo: Vehiculo!
     tipo: String!
-    consumo_litros_100km: Float!
+    consumoLitros100km: Float!
 }
 
 type Query {
-    vehiculos: [Vehiculo!]!
     vehiculo(id: ID!): Vehiculo
-    tiposVehiculo: [TipoVehiculo!]!
+    vehiculos: [Vehiculo!]!
     tipoVehiculo(id: ID!): TipoVehiculo
-    mantenimientos: [Mantenimiento!]!
-    mantenimiento(id: ID!): Mantenimiento
-    seguros: [Seguro!]!
-    seguro(id: ID!): Seguro
-    combustibles: [Combustible!]!
-    combustible(id: ID!): Combustible
+    tiposVehiculo: [TipoVehiculo!]!
+    mantenimientosPorVehiculo(vehiculoId: ID!): [Mantenimiento!]!
+    segurosPorVehiculo(vehiculoId: ID!): [Seguro!]!
+    combustiblesPorVehiculo(vehiculoId: ID!): [Combustible!]!
 }
 
 input VehiculoInput {
@@ -61,56 +55,24 @@ input VehiculoInput {
     marca: String!
     modelo: String!
     anio: Int!
-    tipo_id: ID!
+    tipoId: ID!
     estado: String!
 }
 
 input TipoVehiculoInput {
     descripcion: String!
-    capacidad: Int!
+    capacidad: String!
     transmision: String!
 }
 
-input MantenimientoInput {
-    vehiculo_id: ID!
-    fecha_inicio: String!
-    fecha_fin: String!
-    descripcion: String!
-    costo: Float!
-}
-
-input SeguroInput {
-    vehiculo_id: ID!
-    compania: String!
-    tipo_cobertura: String!
-    fecha_inicio: String!
-    fecha_fin: String!
-}
-
-input CombustibleInput {
-    vehiculo_id: ID!
-    tipo: String!
-    consumo_litros_100km: Float!
-}
-
 type Mutation {
-    createVehiculo(input: VehiculoInput!): Vehiculo!
-    updateVehiculo(id: ID!, input: VehiculoInput!): Vehiculo!
-    deleteVehiculo(id: ID!): Boolean!
+    crearVehiculo(input: VehiculoInput!): Vehiculo!
+    actualizarVehiculo(id: ID!, input: VehiculoInput!): Vehiculo!
+    eliminarVehiculo(id: ID!): Boolean!
     
-    createTipoVehiculo(input: TipoVehiculoInput!): TipoVehiculo!
-    updateTipoVehiculo(id: ID!, input: TipoVehiculoInput!): TipoVehiculo!
-    deleteTipoVehiculo(id: ID!): Boolean!
+    crearTipoVehiculo(input: TipoVehiculoInput!): TipoVehiculo!
+    actualizarTipoVehiculo(id: ID!, input: TipoVehiculoInput!): TipoVehiculo!
+    eliminarTipoVehiculo(id: ID!): Boolean!
     
-    createMantenimiento(input: MantenimientoInput!): Mantenimiento!
-    updateMantenimiento(id: ID!, input: MantenimientoInput!): Mantenimiento!
-    deleteMantenimiento(id: ID!): Boolean!
-    
-    createSeguro(input: SeguroInput!): Seguro!
-    updateSeguro(id: ID!, input: SeguroInput!): Seguro!
-    deleteSeguro(id: ID!): Boolean!
-    
-    createCombustible(input: CombustibleInput!): Combustible!
-    updateCombustible(id: ID!, input: CombustibleInput!): Combustible!
-    deleteCombustible(id: ID!): Boolean!
+    crearMantenimiento(vehiculoId: ID!, fechaInicio: String!, fechaFin: String!, descripcion: String!, costo: Float!): Mantenimiento!
 }
