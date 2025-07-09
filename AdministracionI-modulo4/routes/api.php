@@ -7,23 +7,11 @@ use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\VehiculoSucursalController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Api\RabbitMQTestController;
 use App\Http\Controllers\Api\SystemTestController;
 use App\Services\NotificationService;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-// ===== RUTAS PARA POSTMAN - TESTING =====
-
-// RabbitMQ Testing Routes
-Route::prefix('rabbitmq')->group(function () {
-    Route::get('health', [RabbitMQTestController::class, 'healthCheck']);
-    Route::post('publish', [RabbitMQTestController::class, 'publishEvent']);
-    Route::post('publish-batch', [RabbitMQTestController::class, 'publishBatchEvents']);
-    Route::get('stats', [RabbitMQTestController::class, 'getQueueStats']);
-    Route::get('test-full', [RabbitMQTestController::class, 'fullSystemTest']);
-});
 
 // System Testing Routes
 Route::prefix('test')->group(function () {

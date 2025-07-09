@@ -35,6 +35,7 @@ class EmpleadoCreado implements ShouldBroadcast
             new Channel('dashboard'),
         ];
     }
+    
 
     /**
      * The event's broadcast name.
