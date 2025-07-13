@@ -10,6 +10,7 @@ Route::get('/', function () {
 });
 
 // GraphQL Playground - Evita errores al navegar directamente a /graphql
+
 Route::get('/graphql', function () {
     return response()->json([
         'message' => 'GraphQL endpoint está funcionando. Use POST con query parameter.',

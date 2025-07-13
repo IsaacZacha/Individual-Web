@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  *   "telefono": "0999999999"
  * }
  */
+
 class Empleado extends Model
 {
     use HasFactory;

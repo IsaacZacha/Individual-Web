@@ -46,6 +46,7 @@ class VehiculoSucursal extends Model
     /**
      * Relación con Vehiculo
      */
+    
     public function vehiculo()
     {
         return $this->belongsTo(Vehiculo::class, 'id_vehiculo', 'id_vehiculo');

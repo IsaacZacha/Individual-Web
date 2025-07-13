@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SucursalFactory extends Factory
 {
+    
     public function definition(): array
     {
         return [
