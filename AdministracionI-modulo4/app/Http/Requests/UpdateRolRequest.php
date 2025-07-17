@@ -9,6 +9,7 @@ class UpdateRolRequest extends StoreRolRequest
         $rules = parent::rules();
 
         // Cambia 'required' por 'sometimes|required' en todas las reglas
+        
         foreach ($rules as $key => &$rule) {
             $rule = str_replace('required', 'sometimes|required', $rule);
         }

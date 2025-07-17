@@ -1,6 +1,7 @@
 <?php
 
 /**
+ 
  * Test GraphQL Simple
  * Ejecutar: php test-graphql-simple.php
  */

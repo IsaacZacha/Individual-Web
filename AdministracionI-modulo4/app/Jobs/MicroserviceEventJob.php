@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
  * Job para manejar eventos de microservicios usando colas tipo RabbitMQ
  * Funciona tanto con Redis como con RabbitMQ Cloud
  */
+
 class MicroserviceEventJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
