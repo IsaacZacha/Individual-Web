@@ -195,11 +195,8 @@ app.add_middleware(
 
 # === INTEGRAR GRAPHQL COMO API GATEWAY ===
 
-# Crear aplicación GraphQL
-graphql_app = GraphQLApp(schema=schema)
-
-# Montar GraphQL en la aplicación principal
-app.mount("/graphql", graphql_app)
+# Montar GraphQL en la ruta principal
+app.include_router(graphql_app, prefix="/graphql", tags=["GraphQL API Gateway"])
 
 # === ENDPOINTS DE INFORMACIÓN ===
 

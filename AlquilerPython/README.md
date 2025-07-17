@@ -270,4 +270,4 @@ Para soporte técnico o preguntas:
 
 **Desarrollado con ❤️ usando FastAPI, GraphQL y WebSockets**
 
-**py -m uvicorn app.api_gateway:app --host 0.0.0.0 --port 8001 --reload**
+**py -m uvicorn main_completo_final:app --host 0.0.0.0 --port 8002 --reload**
