@@ -1,19 +1,11 @@
 package com.asw.modulo_administracion_vehiculos.model.entity;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
-import java.time.LocalDate;
+import jakarta.persistence.*;
 import lombok.Data;
 
-@Entity
+import java.time.LocalDate;
+
 @Data
+@Entity
 @Table(name = "mantenimientos")
 public class Mantenimiento {
     @Id
@@ -22,7 +14,7 @@ public class Mantenimiento {
     private Long idMantenimiento;
     
     @ManyToOne
-    @JoinColumn(name = "vehiculo_id")
+    @JoinColumn(name = "vehiculo_id", referencedColumnName = "id_vehiculo")
     private Vehiculo vehiculo;
     
     private LocalDate fechaInicio;

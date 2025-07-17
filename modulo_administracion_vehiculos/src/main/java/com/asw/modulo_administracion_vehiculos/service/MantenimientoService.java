@@ -1,8 +1,9 @@
 package com.asw.modulo_administracion_vehiculos.service;
 
-import com.asw.modulo_administracion_vehiculos.model.Mantenimiento;
-import com.asw.modulo_administracion_vehiculos.repository.MantenimientoRepository;
 import org.springframework.stereotype.Service;
+
+import com.asw.modulo_administracion_vehiculos.model.entity.Mantenimiento;
+import com.asw.modulo_administracion_vehiculos.repository.MantenimientoRepository;
 
 import java.util.List;
 
@@ -14,11 +15,23 @@ public class MantenimientoService {
         this.mantenimientoRepository = mantenimientoRepository;
     }
 
-    public List<Mantenimiento> getMantenimientosByVehiculo() {
+    public List<Mantenimiento> findAllMantenimientos() {
         return mantenimientoRepository.findAll();
+    }
+
+    public Mantenimiento findMantenimientoById(Long id) {
+        return mantenimientoRepository.findById(id).orElse(null);
     }
 
     public Mantenimiento saveMantenimiento(Mantenimiento mantenimiento) {
         return mantenimientoRepository.save(mantenimiento);
+    }
+
+    public void deleteMantenimiento(Long id) {
+        mantenimientoRepository.deleteById(id);
+    }
+
+    public List<Mantenimiento> findMantenimientosByVehiculoId(Long vehiculoId) {
+        return mantenimientoRepository.findByVehiculoIdVehiculo(vehiculoId);
     }
 }

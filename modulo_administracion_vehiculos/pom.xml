@@ -31,6 +31,14 @@
 		</dependency>
 
 
+<!-- Apollo Federation para GraphQL Java -->
+<dependency>
+    <groupId>com.apollographql.federation</groupId>
+    <artifactId>federation-graphql-java-support</artifactId>
+    <version>4.3.0</version> <!-- Usa la última versión disponible -->
+</dependency>
+
+
 		<!-- Spring Boot Starters -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
