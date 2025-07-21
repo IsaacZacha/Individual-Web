@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings(BaseSettings):
-    # Database - Configuración directa de Supabase con connection string correcto
-    database_url: str = "postgresql://postgres:Isaac2398633.@db.ccfctmavbafpkuitfpjw.supabase.co:5432/postgres"
+    # Database - Configuración correcta para Supabase
+    # Formato: postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres
+    database_url: str = "postgresql://postgres.ccfctmavbafpkuitfpjw:Isaac2398633.@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
     
     # Supabase
     supabase_url: str = "https://ccfctmavbafpkuitfpjw.supabase.co"

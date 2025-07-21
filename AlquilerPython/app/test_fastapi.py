@@ -1,15 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# No importamos engine ni Base para evitar conexión automática
-from app.controllers import (
-    cliente_router,
-    vehiculo_router,
-    reserva_router,
-    alquiler_router,
-    pago_router,
-    multa_router,
-    inspeccion_router
-)
 
 # Crear la aplicación FastAPI
 app = FastAPI(
@@ -27,29 +17,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Registrar los routers
-app.include_router(cliente_router)
-app.include_router(vehiculo_router)
-app.include_router(reserva_router)
-app.include_router(alquiler_router)
-app.include_router(pago_router)
-app.include_router(multa_router)
-app.include_router(inspeccion_router)
-
-
 @app.get("/")
 def read_root():
     return {
         "message": "Bienvenido al Sistema de Alquiler de Vehículos",
         "version": "1.0.0",
-        "docs": "/docs"
+        "docs": "/docs",
+        "status": "FastAPI funcionando correctamente"
     }
-
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "framework": "FastAPI"}
 
+@app.get("/test")
+def test_endpoint():
+    return {"message": "Endpoint de prueba funcionando", "framework": "FastAPI"}
 
 if __name__ == "__main__":
     import uvicorn
