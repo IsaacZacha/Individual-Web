@@ -118,7 +118,7 @@
         
         function connect() {
             const channel = document.getElementById('channelSelect').value;
-            const url = `ws://localhost:8000/ws/${channel}`;
+            const url = `ws://127.0.0.1:8001/ws/${channel}`;
             
             try {
                 addMessage(`🔄 Intentando conectar a: ${url}`, 'system');
