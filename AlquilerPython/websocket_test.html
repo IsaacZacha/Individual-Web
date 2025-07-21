@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🚗 Simulación Frontend - Sistema Alquiler WebSockets</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .status { padding: 15px; margin: 15px 0; border-radius: 8px; font-weight: bold; }
+        .connected { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .disconnected { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .control-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .section { padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .message { background-color: #f8f9fa; padding: 12px; margin: 8px 0; border-left: 4px solid #007bff; border-radius: 4px; }
+        .message.received { border-left-color: #28a745; }
+        .message.sent { border-left-color: #ffc107; background-color: #fff3cd; }
+        .message.system { border-left-color: #6c757d; background-color: #e9ecef; }
+        input, select, button { padding: 10px; margin: 5px; border: 1px solid #ced4da; border-radius: 5px; }
+        button { background-color: #007bff; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        #messages { height: 350px; overflow-y: scroll; border: 2px solid #dee2e6; padding: 15px; background: white; border-radius: 5px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; }
+        .stat-card { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; }
+        .demo-section { margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Simulación Frontend - Sistema Alquiler WebSockets</h1>
+            <p><strong>Segundo Parcial - Prueba de Notificaciones en Tiempo Real</strong></p>
+            <p>Esta página simula un frontend para probar las funcionalidades WebSocket del sistema</p>
+        </div>
+        
+        <div id="status" class="status disconnected">🔴 Desconectado - Selecciona un canal y conecta</div>
+        
+        <div class="control-panel">
+            <div class="section">
+                <h3>🔌 Conexión WebSocket</h3>
+                <label><strong>Canal de Suscripción:</strong></label>
+                <select id="channelSelect">
+                    <option value="general">🌍 General (todas las notificaciones)</option>
+                    <option value="reservas">📅 Reservas (nuevas reservas)</option>
+                    <option value="alquileres">🚗 Alquileres (cambios de estado)</option>
+                    <option value="pagos">💳 Pagos (transacciones)</option>
+                    <option value="inspecciones">🔍 Inspecciones (mantenimiento)</option>
+                </select><br>
+                <button onclick="connect()" id="connectBtn">🟢 Conectar</button>
+                <button onclick="disconnect()" id="disconnectBtn" disabled>🔴 Desconectar</button>
+            </div>
+            
+            <div class="section">
+                <h3>📤 Envío de Mensajes</h3>
+                <input type="text" id="messageInput" placeholder="Mensaje de prueba..." style="width: 200px;">
+                <button onclick="sendMessage()" id="sendBtn" disabled>📨 Enviar</button><br>
+                <small>💡 Envía mensajes para probar la comunicación bidireccional</small>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <strong>Estado</strong><br>
+                <span id="connectionStatus">Desconectado</span>
+            </div>
+            <div class="stat-card">
+                <strong>Canal Activo</strong><br>
+                <span id="activeChannel">Ninguno</span>
+            </div>
+            <div class="stat-card">
+                <strong>Mensajes Recibidos</strong><br>
+                <span id="messageCount">0</span>
+            </div>
+            <div class="stat-card">
+                <strong>Tiempo Conectado</strong><br>
+                <span id="connectionTime">0s</span>
+            </div>
+        </div>
+        
+        <h3>📨 Monitor de Notificaciones en Tiempo Real</h3>
+        <div id="messages"></div>
+        
+        <div class="demo-section">
+            <h3>🎯 Simulación de Eventos del Sistema</h3>
+            <p>Usa estos botones para simular eventos y ver las notificaciones WebSocket en tiempo real:</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
+                <button onclick="simulateReserva()" style="background-color: #28a745;">📅 Simular Nueva Reserva</button>
+                <button onclick="simulateAlquiler()" style="background-color: #17a2b8;">🚗 Simular Cambio de Estado</button>
+                <button onclick="simulatePago()" style="background-color: #ffc107; color: black;">💳 Simular Pago</button>
+                <button onclick="simulateInspeccion()" style="background-color: #6f42c1;">🔍 Simular Inspección</button>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px;">
+                <strong>💡 Instrucciones:</strong>
+                <ol>
+                    <li>Conecta a un canal (recomendado: "General" para ver todo)</li>
+                    <li>Usa los botones de simulación para generar eventos</li>
+                    <li>Observa las notificaciones en tiempo real</li>
+                    <li>Prueba diferentes canales para filtrar notificaciones</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let messageCount = 0;
+        let connectionStartTime = null;
+        let connectionTimer = null;
+        
+        function updateConnectionTime() {
+            if (connectionStartTime) {
+                const elapsed = Math.floor((Date.now() - connectionStartTime) / 1000);
+                document.getElementById('connectionTime').textContent = `${elapsed}s`;
+            }
+        }
+        
+        function connect() {
+            const channel = document.getElementById('channelSelect').value;
+            const url = `ws://localhost:8000/ws/${channel}`;
+            
+            try {
+                addMessage(`🔄 Intentando conectar a: ${url}`, 'system');
+                ws = new WebSocket(url);
+                
+                ws.onopen = function(event) {
+                    connectionStartTime = Date.now();
+                    connectionTimer = setInterval(updateConnectionTime, 1000);
+                    
+                    document.getElementById('status').className = 'status connected';
+                    document.getElementById('status').textContent = `🟢 Conectado exitosamente al canal: ${channel}`;
+                    document.getElementById('connectionStatus').textContent = 'Conectado';
+                    document.getElementById('activeChannel').textContent = channel;
+                    
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                    document.getElementById('sendBtn').disabled = false;
+                    
+                    addMessage(`✅ Conexión WebSocket establecida correctamente`, 'system');
+                    addMessage(`🎯 Canal activo: ${channel} - Esperando notificaciones...`, 'system');
+                };
+                
+                ws.onmessage = function(event) {
+                    messageCount++;
+                    document.getElementById('messageCount').textContent = messageCount;
+                    
+                    try {
+                        const data = JSON.parse(event.data);
+                        addMessage(`📨 Notificación recibida:\n${JSON.stringify(data, null, 2)}`, 'received');
+                    } catch (e) {
+                        addMessage(`📨 Mensaje: ${event.data}`, 'received');
+                    }
+                };
+                
+                ws.onclose = function(event) {
+                    if (connectionTimer) {
+                        clearInterval(connectionTimer);
+                        connectionTimer = null;
+                    }
+                    connectionStartTime = null;
+                    
+                    document.getElementById('status').className = 'status disconnected';
+                    document.getElementById('status').textContent = '🔴 Desconectado del WebSocket';
+                    document.getElementById('connectionStatus').textContent = 'Desconectado';
+                    document.getElementById('activeChannel').textContent = 'Ninguno';
+                    document.getElementById('connectionTime').textContent = '0s';
+                    
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                    
+                    addMessage(`❌ WebSocket desconectado (Código: ${event.code})`, 'system');
+                };
+                
+                ws.onerror = function(error) {
+                    addMessage(`❌ Error de WebSocket: ${error}`, 'system');
+                    console.error('WebSocket error:', error);
+                };
+                
+            } catch (error) {
+                addMessage(`❌ Error de conexión: ${error.message}`, 'system');
+            }
+        }
+        
+        function disconnect() {
+            if (ws) {
+                ws.close();
+            }
+        }
+        
+        function sendMessage() {
+            const message = document.getElementById('messageInput').value.trim();
+            if (ws && ws.readyState === WebSocket.OPEN && message) {
+                ws.send(message);
+                addMessage(`📤 Enviado: ${message}`, 'sent');
+                document.getElementById('messageInput').value = '';
+            } else {
+                addMessage(`❌ No se puede enviar: conexión no disponible o mensaje vacío`, 'system');
+            }
+        }
+        
+        function addMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'received' ? '📥' : type === 'sent' ? '📤' : '🔧';
+            
+            messageDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <strong>${icon} ${type.toUpperCase()}</strong>
+                    <small style="color: #6c757d;">${timestamp}</small>
+                </div>
+                <div style="white-space: pre-wrap; font-family: monospace;">${message}</div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Funciones de simulación de eventos
+        function simulateReserva() {
+            const simulatedEvent = {
+                type: "nueva_reserva",
+                data: {
+                    id_reserva: Math.floor(Math.random() * 1000) + 1,
+                    cliente_id: Math.floor(Math.random() * 10) + 1,
+                    vehiculo_id: Math.floor(Math.random() * 5) + 1,
+                    fecha_inicio: new Date().toISOString().split('T')[0],
+                    estado: "confirmada"
+                },
+                message: "🎉 Nueva reserva creada exitosamente",
+                timestamp: new Date().toISOString()
+            };
+            
+            addMessage(`🎯 Simulando evento: Nueva Reserva\n${JSON.stringify(simulatedEvent, null, 2)}`, 'sent');
+            
+            // En un sistema real, esto activaría una notificación WebSocket automática
+            setTimeout(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    addMessage(`💡 En un sistema real, este evento generaría una notificación automática a todos los clientes conectados al canal 'reservas' o 'general'`, 'system');
+                }
+            }, 500);
+        }
+        
+        function simulateAlquiler() {
+            const estados = ['activo', 'completado', 'cancelado'];
+            const estado = estados[Math.floor(Math.random() * estados.length)];
+            
+            const simulatedEvent = {
+                type: "estado_alquiler",
+                data: {
+                    id_alquiler: Math.floor(Math.random() * 1000) + 1,
+                    nuevo_estado: estado,
+                    fecha_actualizacion: new Date().toISOString()
+                },
+                message: `🔄 Estado de alquiler actualizado a: ${estado}`,
+                timestamp: new Date().toISOString()
+            };
+            
+            addMessage(`🎯 Simulando evento: Cambio Estado Alquiler\n${JSON.stringify(simulatedEvent, null, 2)}`, 'sent');
+        }
+        
+        function simulatePago() {
+            const simulatedEvent = {
+                type: "nuevo_pago",
+                data: {
+                    id_pago: Math.floor(Math.random() * 1000) + 1,
+                    monto: (Math.random() * 500 + 50).toFixed(2),
+                    metodo: "tarjeta_credito",
+                    estado: "completado"
+                },
+                message: "💳 Pago procesado exitosamente",
+                timestamp: new Date().toISOString()
+            };
+            
+            addMessage(`🎯 Simulando evento: Nuevo Pago\n${JSON.stringify(simulatedEvent, null, 2)}`, 'sent');
+        }
+        
+        function simulateInspeccion() {
+            const simulatedEvent = {
+                type: "nueva_inspeccion",
+                data: {
+                    id_inspeccion: Math.floor(Math.random() * 1000) + 1,
+                    vehiculo_id: Math.floor(Math.random() * 5) + 1,
+                    tipo: "mantenimiento_preventivo",
+                    estado: "programada"
+                },
+                message: "🔍 Nueva inspección programada",
+                timestamp: new Date().toISOString()
+            };
+            
+            addMessage(`🎯 Simulando evento: Nueva Inspección\n${JSON.stringify(simulatedEvent, null, 2)}`, 'sent');
+        }
+        
+        // Event listeners
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Mensaje inicial
+        window.onload = function() {
+            addMessage(`🚀 Simulación Frontend inicializada\n📡 Sistema listo para probar WebSockets\n💡 Selecciona un canal y conecta para comenzar`, 'system');
+        };
+    </script>
+</body>
+</html>

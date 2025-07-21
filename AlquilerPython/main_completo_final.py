@@ -500,12 +500,12 @@ async def startup_event():
     print("\n" + "="*60)
     print("🚗 API GATEWAY COMPLETO - SEGUNDO PARCIAL")
     print("="*60)
-    print("✅ Schema Unificado tipo GraphQL: http://localhost:8001/api/schema")
-    print("✅ Consultas Complejas: http://localhost:8001/api/query")
-    print("✅ WebSocket Notificaciones: ws://localhost:8001/ws/{channel}")
-    print("✅ API REST Completa: http://localhost:8001/api/")
-    print("✅ Tests de Integración: http://localhost:8001/api/test")
-    print("✅ Documentación: http://localhost:8001/docs")
+    print("✅ Schema Unificado tipo GraphQL: http://localhost:8000/api/schema")
+    print("✅ Consultas Complejas: http://localhost:8000/api/query")
+    print("✅ WebSocket Notificaciones: ws://localhost:8000/ws/{channel}")
+    print("✅ API REST Completa: http://localhost:8000/api/")
+    print("✅ Tests de Integración: http://localhost:8000/api/test")
+    print("✅ Documentación: http://localhost:8000/docs")
     print("="*60)
     print("📋 CUMPLIMIENTO RÚBRICA:")
     print("   35% Integración GraphQL: ✅ COMPLETO")
@@ -527,4 +527,4 @@ async def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -269,5 +269,12 @@ Para soporte técnico o preguntas:
 ---
 
 **Desarrollado con ❤️ usando FastAPI, GraphQL y WebSockets**
+**MÉTODO 1: Demo Completa (Puerto 8000)**
+**py main_completo_final.py**
+**MÉTODO 2: Versión Principal con Base de Datos**
+**py -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000**
+**MÉTODO 3: Gateway Empresarial**
+**py -m uvicorn app.api_gateway:app --reload --host 0.0.0.0 --port 8000**
 
-**py -m uvicorn main_completo_final:app --host 0.0.0.0 --port 8002 --reload**
+
+**start websocket_test.html**
