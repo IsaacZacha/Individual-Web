@@ -1,0 +1,115 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key", "@shareable", "@external", "@requires", "@provides"])
+
+type Query {
+  vehiculos: [Vehiculo] @shareable
+  vehiculo(id: ID!): Vehiculo @shareable
+  vehiculosPorEstado(estado: String!): [Vehiculo] @shareable
+  vehiculosPorMarca(marca: String!): [Vehiculo] @shareable
+  tiposVehiculo: [TipoVehiculo] @shareable
+  tipoVehiculo(id: ID!): TipoVehiculo @shareable
+  tiposVehiculoPorCapacidad(capacidad: String!): [TipoVehiculo] @shareable
+  tiposVehiculoPorTransmision(transmision: String!): [TipoVehiculo] @shareable
+  mantenimientos: [Mantenimiento] @shareable
+  mantenimiento(id: ID!): Mantenimiento @shareable
+  mantenimientosPorVehiculo(vehiculoId: ID!): [Mantenimiento] @shareable
+  mantenimientosPorRangoFechas(fechaInicio: String!, fechaFin: String!): [Mantenimiento] @shareable
+  mantenimientosPorCostoMinimo(costo: Float!): [Mantenimiento] @shareable
+  seguros: [Seguro] @shareable
+  seguro(id: ID!): Seguro @shareable
+  segurosPorVehiculo(vehiculoId: ID!): [Seguro] @shareable
+  segurosPorCompania(compania: String!): [Seguro] @shareable
+  segurosPorTipoCobertura(tipoCobertura: String!): [Seguro] @shareable
+  segurosVigentes(fechaActual: String!): [Seguro] @shareable
+  combustibles: [Combustible] @shareable
+  combustible(id: ID!): Combustible @shareable
+  combustiblesPorVehiculo(vehiculoId: ID!): [Combustible] @shareable
+  combustiblesPorTipo(tipo: String!): [Combustible] @shareable
+  combustiblesPorConsumoMaximo(consumoMaximo: Float!): [Combustible] @shareable
+}
+
+type Mutation {
+  crearVehiculo(
+    placa: String!
+    marca: String!
+    modelo: String!
+    anio: Int!
+    estado: String!
+    tipoId: ID!
+  ): Vehiculo
+  
+  crearTipoVehiculo(
+    descripcion: String!
+    capacidad: String!
+    transmision: String!
+  ): TipoVehiculo
+  
+  crearMantenimiento(
+    vehiculoId: ID!
+    fechaInicio: String!
+    fechaFin: String!
+    descripcion: String!
+    costo: Float!
+  ): Mantenimiento
+  
+  crearSeguro(
+    vehiculoId: ID!
+    compania: String!
+    tipoCobertura: String!
+    fechaInicio: String!
+    fechaFin: String!
+  ): Seguro
+  
+  crearCombustible(
+    vehiculoId: ID!
+    tipo: String!
+    consumoLitros100km: Float!
+  ): Combustible
+}
+
+type Vehiculo @key(fields: "id_vehiculo") {
+  id_vehiculo: ID!
+  placa: String!
+  marca: String!
+  modelo: String!
+  anio: Int!
+  estado: String!
+  tipo: TipoVehiculo!
+  mantenimientos: [Mantenimiento]
+  seguros: [Seguro]
+  combustibles: [Combustible]
+}
+
+type TipoVehiculo @key(fields: "id_tipo") {
+  id_tipo: ID!
+  descripcion: String!
+  capacidad: String!
+  transmision: String!
+  vehiculos: [Vehiculo]
+}
+
+type Mantenimiento @key(fields: "id_mantenimiento") {
+  id_mantenimiento: ID!
+  vehiculo: Vehiculo!
+  fecha_inicio: String!
+  fecha_fin: String!
+  descripcion: String!
+  costo: Float!
+}
+
+type Seguro @key(fields: "id_seguro") {
+  id_seguro: ID!
+  vehiculo: Vehiculo!
+  compania: String!
+  tipo_cobertura: String!
+  fecha_inicio: String!
+  fecha_fin: String!
+}
+
+type Combustible @key(fields: "id_combustible") {
+  id_combustible: ID!
+  vehiculo: Vehiculo!
+  tipo: String!
+  consumo_litros_100km: Float!
+}

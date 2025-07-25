@@ -1,0 +1,324 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key", "@shareable", "@external", "@requires", "@provides"])
+
+type Query {
+  clientes(where: ClienteFilterInput, order: [ClienteSortInput!]): [Cliente!]! @shareable
+  licencias(where: LicenciaConduccionFilterInput, order: [LicenciaConduccionSortInput!]): [LicenciaConduccion!]! @shareable
+  tarjetas(where: TarjetaPagoFilterInput, order: [TarjetaPagoSortInput!]): [TarjetaPago!]! @shareable
+  evaluaciones(where: EvaluacionClienteFilterInput, order: [EvaluacionClienteSortInput!]): [EvaluacionCliente!]! @shareable
+  alquileres(where: HistorialAlquilerFilterInput, order: [HistorialAlquilerSortInput!]): [HistorialAlquiler!]! @shareable
+  clienteById(id: Int!): Cliente @shareable
+}
+
+type Mutation {
+  addCliente(input: ClienteInput!): Cliente!
+  addLicencia(input: LicenciaInput!): LicenciaConduccion!
+  addTarjeta(input: TarjetaInput!): TarjetaPago!
+  addEvaluacion(input: EvaluacionInput!): EvaluacionCliente!
+  addAlquiler(input: AlquilerInput!): HistorialAlquiler!
+  deleteCliente(id: Int!): String!
+}
+
+type Cliente @key(fields: "idCliente") {
+  idCliente: Int!
+  nombre: String
+  apellido: String
+  cedulaPasaporte: String
+  direccion: String
+  correo: String
+  telefono: String
+  licenciasConduccion: [LicenciaConduccion!]!
+  tarjetasPago: [TarjetaPago!]!
+  evaluaciones: [EvaluacionCliente!]!
+  historialAlquileres: [HistorialAlquiler!]!
+}
+
+type LicenciaConduccion @key(fields: "idLicencia") {
+  idLicencia: Int!
+  clienteId: Int!
+  numero: String
+  paisEmision: String
+  fechaEmision: DateTime
+  fechaVencimiento: DateTime
+  cliente: Cliente
+}
+
+type TarjetaPago @key(fields: "idTarjeta") {
+  idTarjeta: Int!
+  clienteId: Int!
+  numeroTarjeta: String
+  tipo: String
+  fechaExpiracion: DateTime!
+  cliente: Cliente
+}
+
+type EvaluacionCliente @key(fields: "idEvaluacion") {
+  idEvaluacion: Int!
+  clienteId: Int!
+  fecha: DateTime!
+  puntaje: Int!
+  comentarios: String
+  cliente: Cliente
+}
+
+type HistorialAlquiler @key(fields: "idHistorial") {
+  idHistorial: Int!
+  clienteId: Int!
+  vehiculoId: Int!
+  fechaInicio: DateTime!
+  fechaFin: DateTime!
+  totalPagado: Decimal!
+  cliente: Cliente
+}
+
+input ClienteInput {
+  nombre: String!
+  apellido: String!
+  cedulaPasaporte: String!
+  direccion: String!
+  correo: String!
+  telefono: String!
+}
+
+input LicenciaInput {
+  clienteId: Int!
+  numero: String!
+  paisEmision: String!
+  fechaEmision: DateTime!
+  fechaVencimiento: DateTime!
+}
+
+input TarjetaInput {
+  clienteId: Int!
+  numeroTarjeta: String!
+  tipo: String!
+  fechaExpiracion: DateTime!
+}
+
+input EvaluacionInput {
+  clienteId: Int!
+  puntaje: Int!
+  comentarios: String!
+}
+
+input AlquilerInput {
+  clienteId: Int!
+  vehiculoId: Int!
+  fechaInicio: DateTime!
+  fechaFin: DateTime!
+  totalPagado: Decimal!
+}
+
+input ClienteFilterInput {
+  and: [ClienteFilterInput!]
+  or: [ClienteFilterInput!]
+  idCliente: IntOperationFilterInput
+  nombre: StringOperationFilterInput
+  apellido: StringOperationFilterInput
+  cedulaPasaporte: StringOperationFilterInput
+  direccion: StringOperationFilterInput
+  correo: StringOperationFilterInput
+  telefono: StringOperationFilterInput
+  licenciasConduccion: ListFilterInputTypeOfLicenciaConduccionFilterInput
+  tarjetasPago: ListFilterInputTypeOfTarjetaPagoFilterInput
+  evaluaciones: ListFilterInputTypeOfEvaluacionClienteFilterInput
+  historialAlquileres: ListFilterInputTypeOfHistorialAlquilerFilterInput
+}
+
+input ClienteSortInput {
+  idCliente: SortEnumType
+  nombre: SortEnumType
+  apellido: SortEnumType
+  cedulaPasaporte: SortEnumType
+  direccion: SortEnumType
+  correo: SortEnumType
+  telefono: SortEnumType
+}
+
+input LicenciaConduccionFilterInput {
+  and: [LicenciaConduccionFilterInput!]
+  or: [LicenciaConduccionFilterInput!]
+  idLicencia: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  numero: StringOperationFilterInput
+  paisEmision: StringOperationFilterInput
+  fechaEmision: DateTimeOperationFilterInput
+  fechaVencimiento: DateTimeOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input LicenciaConduccionSortInput {
+  idLicencia: SortEnumType
+  clienteId: SortEnumType
+  numero: SortEnumType
+  paisEmision: SortEnumType
+  fechaEmision: SortEnumType
+  fechaVencimiento: SortEnumType
+  cliente: ClienteSortInput
+}
+
+input TarjetaPagoFilterInput {
+  and: [TarjetaPagoFilterInput!]
+  or: [TarjetaPagoFilterInput!]
+  idTarjeta: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  numeroTarjeta: StringOperationFilterInput
+  tipo: StringOperationFilterInput
+  fechaExpiracion: DateTimeOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input TarjetaPagoSortInput {
+  idTarjeta: SortEnumType
+  clienteId: SortEnumType
+  numeroTarjeta: SortEnumType
+  tipo: SortEnumType
+  fechaExpiracion: SortEnumType
+  cliente: ClienteSortInput
+}
+
+input EvaluacionClienteFilterInput {
+  and: [EvaluacionClienteFilterInput!]
+  or: [EvaluacionClienteFilterInput!]
+  idEvaluacion: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  fecha: DateTimeOperationFilterInput
+  puntaje: IntOperationFilterInput
+  comentarios: StringOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input EvaluacionClienteSortInput {
+  idEvaluacion: SortEnumType
+  clienteId: SortEnumType
+  fecha: SortEnumType
+  puntaje: SortEnumType
+  comentarios: SortEnumType
+  cliente: ClienteSortInput
+}
+
+input HistorialAlquilerFilterInput {
+  and: [HistorialAlquilerFilterInput!]
+  or: [HistorialAlquilerFilterInput!]
+  idHistorial: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  vehiculoId: IntOperationFilterInput
+  fechaInicio: DateTimeOperationFilterInput
+  fechaFin: DateTimeOperationFilterInput
+  totalPagado: DecimalOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input HistorialAlquilerSortInput {
+  idHistorial: SortEnumType
+  clienteId: SortEnumType
+  vehiculoId: SortEnumType
+  fechaInicio: SortEnumType
+  fechaFin: SortEnumType
+  totalPagado: SortEnumType
+  cliente: ClienteSortInput
+}
+
+input IntOperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int]
+  nin: [Int]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+input DateTimeOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input DecimalOperationFilterInput {
+  eq: Decimal
+  neq: Decimal
+  in: [Decimal]
+  nin: [Decimal]
+  gt: Decimal
+  ngt: Decimal
+  gte: Decimal
+  ngte: Decimal
+  lt: Decimal
+  nlt: Decimal
+  lte: Decimal
+  nlte: Decimal
+}
+
+input ListFilterInputTypeOfLicenciaConduccionFilterInput {
+  all: LicenciaConduccionFilterInput
+  none: LicenciaConduccionFilterInput
+  some: LicenciaConduccionFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfTarjetaPagoFilterInput {
+  all: TarjetaPagoFilterInput
+  none: TarjetaPagoFilterInput
+  some: TarjetaPagoFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfEvaluacionClienteFilterInput {
+  all: EvaluacionClienteFilterInput
+  none: EvaluacionClienteFilterInput
+  some: EvaluacionClienteFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfHistorialAlquilerFilterInput {
+  all: HistorialAlquilerFilterInput
+  none: HistorialAlquilerFilterInput
+  some: HistorialAlquilerFilterInput
+  any: Boolean
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+"""
+The DateTime scalar represents an ISO-8601 compliant date time type.
+"""
+scalar DateTime @specifiedBy(url: "https://www.graphql-scalars.com/date-time")
+
+"""
+The built-in Decimal scalar type.
+"""
+scalar Decimal

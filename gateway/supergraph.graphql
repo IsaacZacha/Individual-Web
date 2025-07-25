@@ -1,0 +1,706 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+type Alquiler
+  @join__type(graph: ALQUILERES, key: "id_alquiler")
+{
+  id_alquiler: ID!
+  reserva: Reserva
+  fecha_entrega: String!
+  fecha_devolucion: String
+  kilometraje_inicial: Float!
+  kilometraje_final: Float
+  total: Float
+}
+
+input AlquilerInput
+  @join__type(graph: CLIENTES)
+{
+  clienteId: Int!
+  vehiculoId: Int!
+  fechaInicio: DateTime!
+  fechaFin: DateTime!
+  totalPagado: Decimal!
+}
+
+type Cliente
+  @join__type(graph: CLIENTES, key: "idCliente")
+{
+  idCliente: Int!
+  nombre: String
+  apellido: String
+  cedulaPasaporte: String
+  direccion: String
+  correo: String
+  telefono: String
+  licenciasConduccion: [LicenciaConduccion!]!
+  tarjetasPago: [TarjetaPago!]!
+  evaluaciones: [EvaluacionCliente!]!
+  historialAlquileres: [HistorialAlquiler!]!
+}
+
+input ClienteFilterInput
+  @join__type(graph: CLIENTES)
+{
+  and: [ClienteFilterInput!]
+  or: [ClienteFilterInput!]
+  idCliente: IntOperationFilterInput
+  nombre: StringOperationFilterInput
+  apellido: StringOperationFilterInput
+  cedulaPasaporte: StringOperationFilterInput
+  direccion: StringOperationFilterInput
+  correo: StringOperationFilterInput
+  telefono: StringOperationFilterInput
+  licenciasConduccion: ListFilterInputTypeOfLicenciaConduccionFilterInput
+  tarjetasPago: ListFilterInputTypeOfTarjetaPagoFilterInput
+  evaluaciones: ListFilterInputTypeOfEvaluacionClienteFilterInput
+  historialAlquileres: ListFilterInputTypeOfHistorialAlquilerFilterInput
+}
+
+input ClienteInput
+  @join__type(graph: CLIENTES)
+{
+  nombre: String!
+  apellido: String!
+  cedulaPasaporte: String!
+  direccion: String!
+  correo: String!
+  telefono: String!
+}
+
+input ClienteSortInput
+  @join__type(graph: CLIENTES)
+{
+  idCliente: SortEnumType
+  nombre: SortEnumType
+  apellido: SortEnumType
+  cedulaPasaporte: SortEnumType
+  direccion: SortEnumType
+  correo: SortEnumType
+  telefono: SortEnumType
+}
+
+type Combustible
+  @join__type(graph: VEHICULOS, key: "id_combustible")
+{
+  id_combustible: ID!
+  vehiculo: Vehiculo!
+  tipo: String!
+  consumo_litros_100km: Float!
+}
+
+"""The DateTime scalar represents an ISO-8601 compliant date time type."""
+scalar DateTime
+  @join__type(graph: CLIENTES)
+  @specifiedBy(url: "https://www.graphql-scalars.com/date-time")
+
+input DateTimeOperationFilterInput
+  @join__type(graph: CLIENTES)
+{
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+"""The built-in Decimal scalar type."""
+scalar Decimal
+  @join__type(graph: CLIENTES)
+
+input DecimalOperationFilterInput
+  @join__type(graph: CLIENTES)
+{
+  eq: Decimal
+  neq: Decimal
+  in: [Decimal]
+  nin: [Decimal]
+  gt: Decimal
+  ngt: Decimal
+  gte: Decimal
+  ngte: Decimal
+  lt: Decimal
+  nlt: Decimal
+  lte: Decimal
+  nlte: Decimal
+}
+
+type DeleteResult
+  @join__type(graph: ADMINISTRACION)
+{
+  success: Boolean!
+  message: String!
+  deleted_id: String
+}
+
+type Empleado
+  @join__type(graph: ADMINISTRACION, key: "id_empleado")
+{
+  id_empleado: ID!
+  nombre: String!
+  cargo: String!
+  correo: String!
+  telefono: String
+  created_at: String
+  updated_at: String
+}
+
+input EmpleadoInput
+  @join__type(graph: ADMINISTRACION)
+{
+  nombre: String!
+  cargo: String!
+  correo: String!
+  telefono: String
+}
+
+type EvaluacionCliente
+  @join__type(graph: CLIENTES, key: "idEvaluacion")
+{
+  idEvaluacion: Int!
+  clienteId: Int!
+  fecha: DateTime!
+  puntaje: Int!
+  comentarios: String
+  cliente: Cliente
+}
+
+input EvaluacionClienteFilterInput
+  @join__type(graph: CLIENTES)
+{
+  and: [EvaluacionClienteFilterInput!]
+  or: [EvaluacionClienteFilterInput!]
+  idEvaluacion: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  fecha: DateTimeOperationFilterInput
+  puntaje: IntOperationFilterInput
+  comentarios: StringOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input EvaluacionClienteSortInput
+  @join__type(graph: CLIENTES)
+{
+  idEvaluacion: SortEnumType
+  clienteId: SortEnumType
+  fecha: SortEnumType
+  puntaje: SortEnumType
+  comentarios: SortEnumType
+  cliente: ClienteSortInput
+}
+
+input EvaluacionInput
+  @join__type(graph: CLIENTES)
+{
+  clienteId: Int!
+  puntaje: Int!
+  comentarios: String!
+}
+
+type HistorialAlquiler
+  @join__type(graph: CLIENTES, key: "idHistorial")
+{
+  idHistorial: Int!
+  clienteId: Int!
+  vehiculoId: Int!
+  fechaInicio: DateTime!
+  fechaFin: DateTime!
+  totalPagado: Decimal!
+  cliente: Cliente
+}
+
+input HistorialAlquilerFilterInput
+  @join__type(graph: CLIENTES)
+{
+  and: [HistorialAlquilerFilterInput!]
+  or: [HistorialAlquilerFilterInput!]
+  idHistorial: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  vehiculoId: IntOperationFilterInput
+  fechaInicio: DateTimeOperationFilterInput
+  fechaFin: DateTimeOperationFilterInput
+  totalPagado: DecimalOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input HistorialAlquilerSortInput
+  @join__type(graph: CLIENTES)
+{
+  idHistorial: SortEnumType
+  clienteId: SortEnumType
+  vehiculoId: SortEnumType
+  fechaInicio: SortEnumType
+  fechaFin: SortEnumType
+  totalPagado: SortEnumType
+  cliente: ClienteSortInput
+}
+
+type Inspeccion
+  @join__type(graph: ALQUILERES, key: "id_inspeccion")
+{
+  id_inspeccion: ID!
+  alquiler: Alquiler
+  fecha: String!
+  observaciones: String!
+  estado_vehiculo: String!
+}
+
+input IntOperationFilterInput
+  @join__type(graph: CLIENTES)
+{
+  eq: Int
+  neq: Int
+  in: [Int]
+  nin: [Int]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  ADMINISTRACION @join__graph(name: "administracion", url: "http://localhost:8000/graphql")
+  ALQUILERES @join__graph(name: "alquileres", url: "http://127.0.0.1:2000/graphql")
+  CLIENTES @join__graph(name: "clientes", url: "http://localhost:5161/graphql")
+  VEHICULOS @join__graph(name: "vehiculos", url: "http://localhost:8080/graphql")
+}
+
+type LicenciaConduccion
+  @join__type(graph: CLIENTES, key: "idLicencia")
+{
+  idLicencia: Int!
+  clienteId: Int!
+  numero: String
+  paisEmision: String
+  fechaEmision: DateTime
+  fechaVencimiento: DateTime
+  cliente: Cliente
+}
+
+input LicenciaConduccionFilterInput
+  @join__type(graph: CLIENTES)
+{
+  and: [LicenciaConduccionFilterInput!]
+  or: [LicenciaConduccionFilterInput!]
+  idLicencia: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  numero: StringOperationFilterInput
+  paisEmision: StringOperationFilterInput
+  fechaEmision: DateTimeOperationFilterInput
+  fechaVencimiento: DateTimeOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input LicenciaConduccionSortInput
+  @join__type(graph: CLIENTES)
+{
+  idLicencia: SortEnumType
+  clienteId: SortEnumType
+  numero: SortEnumType
+  paisEmision: SortEnumType
+  fechaEmision: SortEnumType
+  fechaVencimiento: SortEnumType
+  cliente: ClienteSortInput
+}
+
+input LicenciaInput
+  @join__type(graph: CLIENTES)
+{
+  clienteId: Int!
+  numero: String!
+  paisEmision: String!
+  fechaEmision: DateTime!
+  fechaVencimiento: DateTime!
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+input ListFilterInputTypeOfEvaluacionClienteFilterInput
+  @join__type(graph: CLIENTES)
+{
+  all: EvaluacionClienteFilterInput
+  none: EvaluacionClienteFilterInput
+  some: EvaluacionClienteFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfHistorialAlquilerFilterInput
+  @join__type(graph: CLIENTES)
+{
+  all: HistorialAlquilerFilterInput
+  none: HistorialAlquilerFilterInput
+  some: HistorialAlquilerFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfLicenciaConduccionFilterInput
+  @join__type(graph: CLIENTES)
+{
+  all: LicenciaConduccionFilterInput
+  none: LicenciaConduccionFilterInput
+  some: LicenciaConduccionFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfTarjetaPagoFilterInput
+  @join__type(graph: CLIENTES)
+{
+  all: TarjetaPagoFilterInput
+  none: TarjetaPagoFilterInput
+  some: TarjetaPagoFilterInput
+  any: Boolean
+}
+
+type Mantenimiento
+  @join__type(graph: VEHICULOS, key: "id_mantenimiento")
+{
+  id_mantenimiento: ID!
+  vehiculo: Vehiculo!
+  fecha_inicio: String!
+  fecha_fin: String!
+  descripcion: String!
+  costo: Float!
+}
+
+type Multa
+  @join__type(graph: ALQUILERES, key: "id_multa")
+{
+  id_multa: ID!
+  alquiler: Alquiler
+  motivo: String!
+  monto: Float!
+  fecha: String!
+}
+
+type Mutation
+  @join__type(graph: ADMINISTRACION)
+  @join__type(graph: ALQUILERES)
+  @join__type(graph: CLIENTES)
+  @join__type(graph: VEHICULOS)
+{
+  crearEmpleado(input: EmpleadoInput!): Empleado @join__field(graph: ADMINISTRACION)
+  actualizarEmpleado(id_empleado: ID!, input: EmpleadoInput!): Empleado @join__field(graph: ADMINISTRACION)
+  eliminarEmpleado(id_empleado: ID!): DeleteResult @join__field(graph: ADMINISTRACION)
+  crearSucursal(input: SucursalInput!): Sucursal @join__field(graph: ADMINISTRACION)
+  actualizarSucursal(id_sucursal: ID!, input: SucursalInput!): Sucursal @join__field(graph: ADMINISTRACION)
+  eliminarSucursal(id_sucursal: ID!): DeleteResult @join__field(graph: ADMINISTRACION)
+  crearUser(input: UserInput!): User @join__field(graph: ADMINISTRACION)
+  actualizarUser(id_usuario: ID!, input: UserInput!): User @join__field(graph: ADMINISTRACION)
+  eliminarUser(id_usuario: ID!): DeleteResult @join__field(graph: ADMINISTRACION)
+  crearRol(input: RolInput!): Rol @join__field(graph: ADMINISTRACION)
+  actualizarRol(id_rol: ID!, input: RolInput!): Rol @join__field(graph: ADMINISTRACION)
+  eliminarRol(id_rol: ID!): DeleteResult @join__field(graph: ADMINISTRACION)
+  createReserva(cliente_id: Int!, vehiculo_id: Int!, fecha_inicio: String!, fecha_fin: String!, estado: String!): Reserva! @join__field(graph: ALQUILERES)
+  updateReserva(id: ID!, estado: String): Reserva! @join__field(graph: ALQUILERES)
+  deleteReserva(id: ID!): Boolean! @join__field(graph: ALQUILERES)
+  createAlquiler(reserva_id: Int!, fecha_entrega: String!, kilometraje_inicial: Float!): Alquiler! @join__field(graph: ALQUILERES)
+  updateAlquiler(id: ID!, fecha_devolucion: String, kilometraje_final: Float, total: Float): Alquiler! @join__field(graph: ALQUILERES)
+  deleteAlquiler(id: ID!): Boolean! @join__field(graph: ALQUILERES)
+  createPago(alquiler_id: Int!, monto: Float!, metodo: String!): Pago! @join__field(graph: ALQUILERES)
+  updatePago(id: ID!, metodo: String): Pago! @join__field(graph: ALQUILERES)
+  deletePago(id: ID!): Boolean! @join__field(graph: ALQUILERES)
+  createMulta(alquiler_id: Int!, motivo: String!, monto: Float!): Multa! @join__field(graph: ALQUILERES)
+  updateMulta(id: ID!, motivo: String, monto: Float): Multa! @join__field(graph: ALQUILERES)
+  deleteMulta(id: ID!): Boolean! @join__field(graph: ALQUILERES)
+  createInspeccion(alquiler_id: Int!, observaciones: String!, estado_vehiculo: String!): Inspeccion! @join__field(graph: ALQUILERES)
+  updateInspeccion(id: ID!, observaciones: String, estado_vehiculo: String): Inspeccion! @join__field(graph: ALQUILERES)
+  deleteInspeccion(id: ID!): Boolean! @join__field(graph: ALQUILERES)
+  addCliente(input: ClienteInput!): Cliente! @join__field(graph: CLIENTES)
+  addLicencia(input: LicenciaInput!): LicenciaConduccion! @join__field(graph: CLIENTES)
+  addTarjeta(input: TarjetaInput!): TarjetaPago! @join__field(graph: CLIENTES)
+  addEvaluacion(input: EvaluacionInput!): EvaluacionCliente! @join__field(graph: CLIENTES)
+  addAlquiler(input: AlquilerInput!): HistorialAlquiler! @join__field(graph: CLIENTES)
+  deleteCliente(id: Int!): String! @join__field(graph: CLIENTES)
+  crearVehiculo(placa: String!, marca: String!, modelo: String!, anio: Int!, estado: String!, tipoId: ID!): Vehiculo @join__field(graph: VEHICULOS)
+  crearTipoVehiculo(descripcion: String!, capacidad: String!, transmision: String!): TipoVehiculo @join__field(graph: VEHICULOS)
+  crearMantenimiento(vehiculoId: ID!, fechaInicio: String!, fechaFin: String!, descripcion: String!, costo: Float!): Mantenimiento @join__field(graph: VEHICULOS)
+  crearSeguro(vehiculoId: ID!, compania: String!, tipoCobertura: String!, fechaInicio: String!, fechaFin: String!): Seguro @join__field(graph: VEHICULOS)
+  crearCombustible(vehiculoId: ID!, tipo: String!, consumoLitros100km: Float!): Combustible @join__field(graph: VEHICULOS)
+}
+
+type Pago
+  @join__type(graph: ALQUILERES, key: "id_pago")
+{
+  id_pago: ID!
+  alquiler: Alquiler
+  fecha: String!
+  monto: Float!
+  metodo: String!
+}
+
+type Query
+  @join__type(graph: ADMINISTRACION)
+  @join__type(graph: ALQUILERES)
+  @join__type(graph: CLIENTES)
+  @join__type(graph: VEHICULOS)
+{
+  empleados: [Empleado!]! @join__field(graph: ADMINISTRACION)
+  empleado(id_empleado: ID!): Empleado @join__field(graph: ADMINISTRACION)
+  sucursales: [Sucursal!]! @join__field(graph: ADMINISTRACION)
+  sucursal(id_sucursal: ID!): Sucursal @join__field(graph: ADMINISTRACION)
+  users: [User!]! @join__field(graph: ADMINISTRACION)
+  user(id_usuario: ID!): User @join__field(graph: ADMINISTRACION)
+  roles: [Rol!]! @join__field(graph: ADMINISTRACION)
+  rol(id_rol: ID!): Rol @join__field(graph: ADMINISTRACION)
+  allReservas: [Reserva!]! @join__field(graph: ALQUILERES)
+  getReserva(id: ID!): Reserva @join__field(graph: ALQUILERES)
+  allAlquileres: [Alquiler!]! @join__field(graph: ALQUILERES)
+  getAlquiler(id: ID!): Alquiler @join__field(graph: ALQUILERES)
+  allPagos: [Pago!]! @join__field(graph: ALQUILERES)
+  getPago(id: ID!): Pago @join__field(graph: ALQUILERES)
+  allMultas: [Multa!]! @join__field(graph: ALQUILERES)
+  getMulta(id: ID!): Multa @join__field(graph: ALQUILERES)
+  allInspecciones: [Inspeccion!]! @join__field(graph: ALQUILERES)
+  getInspeccion(id: ID!): Inspeccion @join__field(graph: ALQUILERES)
+  clientes(where: ClienteFilterInput, order: [ClienteSortInput!]): [Cliente!]! @join__field(graph: CLIENTES)
+  licencias(where: LicenciaConduccionFilterInput, order: [LicenciaConduccionSortInput!]): [LicenciaConduccion!]! @join__field(graph: CLIENTES)
+  tarjetas(where: TarjetaPagoFilterInput, order: [TarjetaPagoSortInput!]): [TarjetaPago!]! @join__field(graph: CLIENTES)
+  evaluaciones(where: EvaluacionClienteFilterInput, order: [EvaluacionClienteSortInput!]): [EvaluacionCliente!]! @join__field(graph: CLIENTES)
+  alquileres(where: HistorialAlquilerFilterInput, order: [HistorialAlquilerSortInput!]): [HistorialAlquiler!]! @join__field(graph: CLIENTES)
+  clienteById(id: Int!): Cliente @join__field(graph: CLIENTES)
+  vehiculos: [Vehiculo] @join__field(graph: VEHICULOS)
+  vehiculo(id: ID!): Vehiculo @join__field(graph: VEHICULOS)
+  vehiculosPorEstado(estado: String!): [Vehiculo] @join__field(graph: VEHICULOS)
+  vehiculosPorMarca(marca: String!): [Vehiculo] @join__field(graph: VEHICULOS)
+  tiposVehiculo: [TipoVehiculo] @join__field(graph: VEHICULOS)
+  tipoVehiculo(id: ID!): TipoVehiculo @join__field(graph: VEHICULOS)
+  tiposVehiculoPorCapacidad(capacidad: String!): [TipoVehiculo] @join__field(graph: VEHICULOS)
+  tiposVehiculoPorTransmision(transmision: String!): [TipoVehiculo] @join__field(graph: VEHICULOS)
+  mantenimientos: [Mantenimiento] @join__field(graph: VEHICULOS)
+  mantenimiento(id: ID!): Mantenimiento @join__field(graph: VEHICULOS)
+  mantenimientosPorVehiculo(vehiculoId: ID!): [Mantenimiento] @join__field(graph: VEHICULOS)
+  mantenimientosPorRangoFechas(fechaInicio: String!, fechaFin: String!): [Mantenimiento] @join__field(graph: VEHICULOS)
+  mantenimientosPorCostoMinimo(costo: Float!): [Mantenimiento] @join__field(graph: VEHICULOS)
+  seguros: [Seguro] @join__field(graph: VEHICULOS)
+  seguro(id: ID!): Seguro @join__field(graph: VEHICULOS)
+  segurosPorVehiculo(vehiculoId: ID!): [Seguro] @join__field(graph: VEHICULOS)
+  segurosPorCompania(compania: String!): [Seguro] @join__field(graph: VEHICULOS)
+  segurosPorTipoCobertura(tipoCobertura: String!): [Seguro] @join__field(graph: VEHICULOS)
+  segurosVigentes(fechaActual: String!): [Seguro] @join__field(graph: VEHICULOS)
+  combustibles: [Combustible] @join__field(graph: VEHICULOS)
+  combustible(id: ID!): Combustible @join__field(graph: VEHICULOS)
+  combustiblesPorVehiculo(vehiculoId: ID!): [Combustible] @join__field(graph: VEHICULOS)
+  combustiblesPorTipo(tipo: String!): [Combustible] @join__field(graph: VEHICULOS)
+  combustiblesPorConsumoMaximo(consumoMaximo: Float!): [Combustible] @join__field(graph: VEHICULOS)
+}
+
+type Reserva
+  @join__type(graph: ALQUILERES, key: "id_reserva")
+{
+  id_reserva: ID!
+  cliente_id: Int!
+  vehiculo_id: Int!
+  fecha_reserva: String!
+  fecha_inicio: String!
+  fecha_fin: String!
+  estado: String!
+}
+
+type Rol
+  @join__type(graph: ADMINISTRACION, key: "id_rol")
+{
+  id_rol: ID!
+  nombre: String!
+  descripcion: String
+  created_at: String
+  updated_at: String
+  users: [User!]
+}
+
+input RolInput
+  @join__type(graph: ADMINISTRACION)
+{
+  nombre: String!
+  descripcion: String
+}
+
+type Seguro
+  @join__type(graph: VEHICULOS, key: "id_seguro")
+{
+  id_seguro: ID!
+  vehiculo: Vehiculo!
+  compania: String!
+  tipo_cobertura: String!
+  fecha_inicio: String!
+  fecha_fin: String!
+}
+
+enum SortEnumType
+  @join__type(graph: CLIENTES)
+{
+  ASC @join__enumValue(graph: CLIENTES)
+  DESC @join__enumValue(graph: CLIENTES)
+}
+
+input StringOperationFilterInput
+  @join__type(graph: CLIENTES)
+{
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+type Sucursal
+  @join__type(graph: ADMINISTRACION, key: "id_sucursal")
+{
+  id_sucursal: ID!
+  nombre: String!
+  direccion: String!
+  ciudad: String!
+  telefono: String
+  created_at: String
+  updated_at: String
+}
+
+input SucursalInput
+  @join__type(graph: ADMINISTRACION)
+{
+  nombre: String!
+  direccion: String!
+  ciudad: String!
+  telefono: String
+}
+
+input TarjetaInput
+  @join__type(graph: CLIENTES)
+{
+  clienteId: Int!
+  numeroTarjeta: String!
+  tipo: String!
+  fechaExpiracion: DateTime!
+}
+
+type TarjetaPago
+  @join__type(graph: CLIENTES, key: "idTarjeta")
+{
+  idTarjeta: Int!
+  clienteId: Int!
+  numeroTarjeta: String
+  tipo: String
+  fechaExpiracion: DateTime!
+  cliente: Cliente
+}
+
+input TarjetaPagoFilterInput
+  @join__type(graph: CLIENTES)
+{
+  and: [TarjetaPagoFilterInput!]
+  or: [TarjetaPagoFilterInput!]
+  idTarjeta: IntOperationFilterInput
+  clienteId: IntOperationFilterInput
+  numeroTarjeta: StringOperationFilterInput
+  tipo: StringOperationFilterInput
+  fechaExpiracion: DateTimeOperationFilterInput
+  cliente: ClienteFilterInput
+}
+
+input TarjetaPagoSortInput
+  @join__type(graph: CLIENTES)
+{
+  idTarjeta: SortEnumType
+  clienteId: SortEnumType
+  numeroTarjeta: SortEnumType
+  tipo: SortEnumType
+  fechaExpiracion: SortEnumType
+  cliente: ClienteSortInput
+}
+
+type TipoVehiculo
+  @join__type(graph: VEHICULOS, key: "id_tipo")
+{
+  id_tipo: ID!
+  descripcion: String!
+  capacidad: String!
+  transmision: String!
+  vehiculos: [Vehiculo]
+}
+
+type User
+  @join__type(graph: ADMINISTRACION, key: "id_usuario")
+{
+  id_usuario: ID!
+  empleado_id: ID!
+  username: String!
+  rol_id: ID!
+  created_at: String
+  updated_at: String
+  rol: Rol
+  empleado: Empleado
+}
+
+input UserInput
+  @join__type(graph: ADMINISTRACION)
+{
+  empleado_id: ID!
+  username: String!
+  password: String!
+  rol_id: ID!
+}
+
+type Vehiculo
+  @join__type(graph: VEHICULOS, key: "id_vehiculo")
+{
+  id_vehiculo: ID!
+  placa: String!
+  marca: String!
+  modelo: String!
+  anio: Int!
+  estado: String!
+  tipo: TipoVehiculo!
+  mantenimientos: [Mantenimiento]
+  seguros: [Seguro]
+  combustibles: [Combustible]
+}

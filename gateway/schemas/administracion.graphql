@@ -1,0 +1,104 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key", "@shareable", "@external", "@requires"])
+
+type DeleteResult {
+  success: Boolean!
+  message: String!
+  deleted_id: String
+}
+
+type Empleado @key(fields: "id_empleado") {
+  id_empleado: ID!
+  nombre: String!
+  cargo: String!
+  correo: String!
+  telefono: String
+  created_at: String
+  updated_at: String
+}
+
+type Sucursal @key(fields: "id_sucursal") {
+  id_sucursal: ID!
+  nombre: String!
+  direccion: String!
+  ciudad: String!
+  telefono: String
+  created_at: String
+  updated_at: String
+}
+
+type User @key(fields: "id_usuario") {
+  id_usuario: ID!
+  empleado_id: ID!
+  username: String!
+  rol_id: ID!
+  created_at: String
+  updated_at: String
+  rol: Rol
+  empleado: Empleado
+}
+
+type Rol @key(fields: "id_rol") {
+  id_rol: ID!
+  nombre: String!
+  descripcion: String
+  created_at: String
+  updated_at: String
+  users: [User!]
+}
+
+input EmpleadoInput {
+  nombre: String!
+  cargo: String!
+  correo: String!
+  telefono: String
+}
+
+input SucursalInput {
+  nombre: String!
+  direccion: String!
+  ciudad: String!
+  telefono: String
+}
+
+input UserInput {
+  empleado_id: ID!
+  username: String!
+  password: String!
+  rol_id: ID!
+}
+
+input RolInput {
+  nombre: String!
+  descripcion: String
+}
+
+type Query {
+  empleados: [Empleado!]! @shareable
+  empleado(id_empleado: ID!): Empleado @shareable
+  sucursales: [Sucursal!]! @shareable
+  sucursal(id_sucursal: ID!): Sucursal @shareable
+  users: [User!]! @shareable
+  user(id_usuario: ID!): User @shareable
+  roles: [Rol!]! @shareable
+  rol(id_rol: ID!): Rol @shareable
+}
+
+type Mutation {
+  crearEmpleado(input: EmpleadoInput!): Empleado
+  actualizarEmpleado(id_empleado: ID!, input: EmpleadoInput!): Empleado
+  eliminarEmpleado(id_empleado: ID!): DeleteResult
+  
+  crearSucursal(input: SucursalInput!): Sucursal
+  actualizarSucursal(id_sucursal: ID!, input: SucursalInput!): Sucursal
+  eliminarSucursal(id_sucursal: ID!): DeleteResult
+  
+  crearUser(input: UserInput!): User
+  actualizarUser(id_usuario: ID!, input: UserInput!): User
+  eliminarUser(id_usuario: ID!): DeleteResult
+  
+  crearRol(input: RolInput!): Rol
+  actualizarRol(id_rol: ID!, input: RolInput!): Rol
+  eliminarRol(id_rol: ID!): DeleteResult
+}

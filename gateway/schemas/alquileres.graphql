@@ -1,0 +1,146 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key", "@shareable"])
+
+type Reserva @key(fields: "id_reserva") {
+  id_reserva: ID!
+  cliente_id: Int!
+  vehiculo_id: Int!
+  fecha_reserva: String!
+  fecha_inicio: String!
+  fecha_fin: String!
+  estado: String!
+}
+
+type Alquiler @key(fields: "id_alquiler") {
+  id_alquiler: ID!
+  reserva: Reserva
+  fecha_entrega: String!
+  fecha_devolucion: String
+  kilometraje_inicial: Float!
+  kilometraje_final: Float
+  total: Float
+}
+
+type Pago @key(fields: "id_pago") {
+  id_pago: ID!
+  alquiler: Alquiler
+  fecha: String!
+  monto: Float!
+  metodo: String!
+}
+
+type Multa @key(fields: "id_multa") {
+  id_multa: ID!
+  alquiler: Alquiler
+  motivo: String!
+  monto: Float!
+  fecha: String!
+}
+
+type Inspeccion @key(fields: "id_inspeccion") {
+  id_inspeccion: ID!
+  alquiler: Alquiler
+  fecha: String!
+  observaciones: String!
+  estado_vehiculo: String!
+}
+
+type Query {
+  # Reservas
+  allReservas: [Reserva!]!
+  getReserva(id: ID!): Reserva
+  
+  # Alquileres
+  allAlquileres: [Alquiler!]!
+  getAlquiler(id: ID!): Alquiler
+  
+  # Pagos
+  allPagos: [Pago!]!
+  getPago(id: ID!): Pago
+  
+  # Multas
+  allMultas: [Multa!]!
+  getMulta(id: ID!): Multa
+  
+  # Inspecciones
+  allInspecciones: [Inspeccion!]!
+  getInspeccion(id: ID!): Inspeccion
+}
+type Mutation {
+  # Reservas
+  createReserva(
+    cliente_id: Int!,
+    vehiculo_id: Int!,
+    fecha_inicio: String!,
+    fecha_fin: String!,
+    estado: String!
+  ): Reserva!
+  
+  updateReserva(
+    id: ID!,
+    estado: String
+  ): Reserva!
+  
+  deleteReserva(id: ID!): Boolean!
+  
+  # Alquileres
+  createAlquiler(
+    reserva_id: Int!,
+    fecha_entrega: String!,
+    kilometraje_inicial: Float!
+  ): Alquiler!
+  
+  updateAlquiler(
+    id: ID!,
+    fecha_devolucion: String,
+    kilometraje_final: Float,
+    total: Float
+  ): Alquiler!
+  
+  deleteAlquiler(id: ID!): Boolean!
+  
+  # Pagos
+  createPago(
+    alquiler_id: Int!,
+    monto: Float!,
+    metodo: String!
+  ): Pago!
+  
+  updatePago(
+    id: ID!,
+    metodo: String
+  ): Pago!
+  
+  deletePago(id: ID!): Boolean!
+  
+  # Multas
+  createMulta(
+    alquiler_id: Int!,
+    motivo: String!,
+    monto: Float!
+  ): Multa!
+  
+  updateMulta(
+    id: ID!,
+    motivo: String,
+    monto: Float
+  ): Multa!
+  
+  deleteMulta(id: ID!): Boolean!
+  
+  # Inspecciones
+  createInspeccion(
+    alquiler_id: Int!,
+    observaciones: String!,
+    estado_vehiculo: String!
+  ): Inspeccion!
+  
+  updateInspeccion(
+    id: ID!,
+    observaciones: String,
+    estado_vehiculo: String
+  ): Inspeccion!
+  
+  deleteInspeccion(id: ID!): Boolean!
+}

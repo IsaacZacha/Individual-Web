@@ -1,0 +1,20 @@
+subgraphs:
+  clientes:
+    routing_url: http://localhost:5161/graphql
+    schema:
+      file: ./schemas/clientes.graphql
+
+  vehiculos:
+    routing_url: http://localhost:8080/graphql
+    schema:
+      file: ./schemas/vehiculos.graphql
+
+  administracion:
+    routing_url: http://localhost:8000/graphql
+    schema:
+      file: ./schemas/administracion.graphql
+
+  alquileres:
+    routing_url: http://127.0.0.1:2000/graphql
+    schema:
+      file: ./schemas/alquileres.graphql
