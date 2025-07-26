@@ -11,12 +11,14 @@ use App\Events\RolEliminado;
 /**
  * Tests completos para ROL: GraphQL CRUD + WebSocket Events
  */
+
 class RolGraphQLWebSocketTest extends GraphQLWebSocketTestCase
 {
     /**
      * @test
      * Test: Crear rol via GraphQL + verificar evento WebSocket
      */
+    
     public function test_crear_rol_graphql_y_websocket()
     {
         $testData = [

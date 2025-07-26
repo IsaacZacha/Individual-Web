@@ -10,6 +10,7 @@ use App\Events\EmpleadoEliminado;
 /**
  * Tests completos para EMPLEADO: GraphQL CRUD + WebSocket Events
  */
+
 class EmpleadoGraphQLWebSocketTest extends GraphQLWebSocketTestCase
 {
     /**
@@ -72,6 +73,7 @@ class EmpleadoGraphQLWebSocketTest extends GraphQLWebSocketTestCase
      * @test
      * Test: Leer empleado via GraphQL query
      */
+    
     public function test_leer_empleado_graphql()
     {
         // Crear empleado de prueba

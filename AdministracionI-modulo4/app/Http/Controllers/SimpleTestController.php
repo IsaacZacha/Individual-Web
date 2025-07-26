@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * Controlador simplificado para probar funcionalidad básica
  */
+
 class SimpleTestController extends Controller
 {
     /**

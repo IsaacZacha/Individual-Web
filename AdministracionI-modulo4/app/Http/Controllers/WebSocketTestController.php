@@ -13,8 +13,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 /**
+ 
  * Controller para probar eventos WebSocket en tiempo real
  */
+
 class WebSocketTestController extends Controller
 {
     /**

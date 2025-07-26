@@ -14,6 +14,7 @@ use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
  * Base class para tests de GraphQL y WebSocket
  * Proporciona métodos comunes para testing
  */
+
 abstract class GraphQLWebSocketTestCase extends TestCase
 {
     use RefreshDatabase, WithFaker, MakesGraphQLRequests;
@@ -32,6 +33,7 @@ abstract class GraphQLWebSocketTestCase extends TestCase
     /**
      * Helper para ejecutar mutation GraphQL
      */
+    
     protected function executeMutation(string $mutation, array $variables = [])
     {
         return $this->graphQL($mutation, $variables);

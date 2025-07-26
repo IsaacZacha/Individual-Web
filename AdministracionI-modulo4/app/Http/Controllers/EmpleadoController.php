@@ -15,6 +15,7 @@ class EmpleadoController extends Controller
     {
         $this->notificationService = $notificationService;
     }
+    
     /**
      * Obtener todos los empleados.
      *
@@ -30,6 +31,7 @@ class EmpleadoController extends Controller
      *   }
      * ]
      */
+
     public function index()
     {
         return response()->json(Empleado::all());

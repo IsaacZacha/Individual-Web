@@ -17,6 +17,7 @@ class SucursalEventTest extends TestCase
      * @test
      * Test directo del evento SucursalCreada
      */
+    
     public function test_sucursal_creada_evento_directo()
     {
         Event::fake();
